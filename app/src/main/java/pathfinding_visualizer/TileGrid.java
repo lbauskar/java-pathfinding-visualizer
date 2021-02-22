@@ -34,4 +34,8 @@ public class TileGrid extends JPanel {
 
         addTiles(width, height); 
     }
+
+    public void consume(String message) {
+        System.out.println("consumed " + message);
+    }
 }
