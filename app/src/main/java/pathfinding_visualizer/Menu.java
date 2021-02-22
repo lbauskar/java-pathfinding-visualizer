@@ -6,6 +6,7 @@ import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.ParseException;
+import java.util.Currency;
 
 public class Menu extends JPanel {
     private static final long serialVersionUID = -2183382640701870707L;
@@ -23,6 +24,7 @@ public class Menu extends JPanel {
         this.add(title);
 
         this.add(gridSizeForm());
+        this.add(paintSelector());
     }
 
     protected JPanel gridSizeForm() {
@@ -39,20 +41,7 @@ public class Menu extends JPanel {
         yField.setText("20");
 
         JButton button = new JButton("Set Grid");
-        button.setActionCommand("resize");
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                String message = String.format("%s %s %s", event.getActionCommand(), xField.getText(),
-                        yField.getText());
-                try {
-                    producer.sendMessage(message);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    Thread.currentThread().interrupt();
-                }
-			}
-        });
+        button.addActionListener(makeListener(String.format("resize %s %s", xField.getText(), yField.getText())));
 
         form.add(xLabel);
         form.add(xField);
@@ -72,6 +61,40 @@ public class Menu extends JPanel {
         }
 
         return formatter;
+    }
+
+    protected JPanel paintSelector() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        final JRadioButton clear = new JRadioButton("clear", true);
+        final JRadioButton wall = new JRadioButton("wall");
+
+        clear.addActionListener(makeListener("paint clear"));
+        wall.addActionListener(makeListener("paint wall"));
+
+        ButtonGroup group = new ButtonGroup();
+        group.add(clear);
+        group.add(wall);
+
+        panel.add(clear);
+        panel.add(wall);
+
+        return panel;
+    }
+
+    ActionListener makeListener(String message) {
+        return new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    producer.sendMessage(message);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                }
+			}
+        };
     }
 
 }

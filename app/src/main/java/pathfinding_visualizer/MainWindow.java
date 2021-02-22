@@ -28,12 +28,12 @@ public class MainWindow extends JFrame {
         constraints.fill = GridBagConstraints.BOTH; // fill up display area horizontally and vertically
         constraints.weighty = 1; // make display area take up whole window's height
 
-        //put menu on left with 25% window width
-        constraints.weightx = 0.25;
+        //put menu on left as small as possible
+        constraints.weightx = 0;
         pane.add(menu, constraints);
         
-        //put grid on right with 75% window width
-        constraints.weightx = 0.75;
+        //put grid on right, filling up the rest of the window
+        constraints.weightx = 0.5;
         pane.add(grid, constraints);
 
     }
