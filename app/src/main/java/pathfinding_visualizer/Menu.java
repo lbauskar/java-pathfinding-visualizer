@@ -39,10 +39,11 @@ public class Menu extends JPanel {
         yField.setText("20");
 
         JButton button = new JButton("Set Grid");
+        button.setActionCommand("resize");
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                String message = String.format("%s: %s %s", event.getActionCommand(), xField.getText(),
+                String message = String.format("%s %s %s", event.getActionCommand(), xField.getText(),
                         yField.getText());
                 try {
                     producer.sendMessage(message);

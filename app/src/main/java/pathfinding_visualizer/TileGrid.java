@@ -33,9 +33,22 @@ public class TileGrid extends JPanel {
         this.setLayout(layout);
 
         addTiles(width, height); 
+        this.revalidate();
     }
 
     public void consume(String message) {
-        System.out.println("consumed " + message);
+        String[] args = message.split(" ");
+        String command = args[0];
+        switch (command) {
+            case "resize":
+                int width = Integer.parseInt(args[1]);
+                int height = Integer.parseInt(args[2]);
+                resizeGrid(width, height);
+                break;
+        
+            default:
+                System.out.println("Unknown command " + command);
+                break;
+        }
     }
 }

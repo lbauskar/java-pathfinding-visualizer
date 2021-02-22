@@ -13,8 +13,6 @@ public class Consumer extends Thread {
     public void run() {
         try {
             while (true) {
-                //System.out.println("running");
-                //wait(1000);
                 String message = p.getMessage();
                 grid.consume(message);
             }
