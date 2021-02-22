@@ -5,14 +5,17 @@ import javax.swing.event.MouseInputListener;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class TileGrid extends JPanel implements MouseInputListener {
-    protected static final long serialVersionUID = 2988009908866290833L; // auto-generated
+    private static final long serialVersionUID = 2988009908866290833L; // auto-generated
     protected ArrayList<JPanel> tiles;
     protected int tileX;
     protected int tileY;
-    private Color paintColor = Color.white;
+    protected Color paintColor = Color.white;
+    protected TileGraph graph;
 
     public TileGrid(int width, int height) {
         this.addMouseMotionListener(this);
@@ -39,6 +42,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
         this.setLayout(layout);
 
         addTiles(width, height);
+        graph = new TileGraph(width, height, false);
         this.revalidate();
     }
 
@@ -51,7 +55,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
                 int height = Integer.parseInt(args[2]);
                 resizeGrid(width, height);
                 break;
-            
+
             case "paint":
                 if (args[1].equals("clear")) {
                     paintColor = Color.white;
@@ -110,13 +114,15 @@ public class TileGrid extends JPanel implements MouseInputListener {
             return;
         }
 
-        //convert pixel coordinates to tile index
+        //convert pixel coordinates to tile index 
         int row = y / tile.getHeight();
         int col = x / tile.getWidth();
-        int index = row * tileX + col;
-
-        //color tile under cursor
-        tiles.get(index).setBackground(paintColor);
+        paintTile(row, col);
     }
 
+    protected void paintTile(int row, int col) {
+        int index = graph.coordToIndex(row, col);
+        graph.setNodeReachability(row, col, paintColor != Color.black);
+        tiles.get(index).setBackground(paintColor);
+    }
 }

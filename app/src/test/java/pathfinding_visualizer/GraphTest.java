@@ -1,5 +1,6 @@
 package pathfinding_visualizer;
 
+import org.checkerframework.checker.units.qual.g;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -29,6 +30,21 @@ public class GraphTest {
 
 
         assertTrue(fileEquality("out.txt", "graph_results/4x4diag_output.txt"));
+    }
+
+    @Test
+    public void FiveByFiveRemoved() throws IOException {
+        FileWriter out = new FileWriter(dir + "out.txt");
+        TileGraph g = new TileGraph(5, 5, true);
+        for (int i = 0; i < 5; ++i) {
+            g.setNodeReachability(1, i, false);
+            g.setNodeReachability(i, 2, false);
+            g.setNodeReachability(i, i, true);
+        }
+        out.write(g.toString());
+        out.close();
+
+        assertTrue(fileEquality("out.txt", "graph_results/5x5rem_output.txt"));
     }
 
     private boolean fileEquality(String file1, String file2) throws IOException {

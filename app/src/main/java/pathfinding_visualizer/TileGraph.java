@@ -1,15 +1,16 @@
 package pathfinding_visualizer;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-public class TileGraph {
+public class TileGraph implements Serializable {
+    private static final long serialVersionUID = -4976456041837817365L;
     private int width;
     private int height;
     private boolean connectDiagonals;
-    private List<List<Pair<Node, List<Edge>>>> graph = new ArrayList<>();
+    private List<List<Pair<Node, ArrayList<Edge>>>> graph = new ArrayList<>();
 
     public TileGraph(int width, int height, boolean connectDiagonals) {
         this.width = width;
@@ -17,7 +18,7 @@ public class TileGraph {
         this.connectDiagonals = connectDiagonals;
         
         for (int row = 0; row < height; ++row) {
-            List<Pair<Node, List<Edge>>> list = new ArrayList<>();
+            List<Pair<Node, ArrayList<Edge>>> list = new ArrayList<>();
             graph.add(list);
             for (int col = 0; col < width; ++col) {
                 list.add(new Pair<>(new Node(row, col), new ArrayList<>()));
@@ -47,12 +48,12 @@ public class TileGraph {
         return graph.get(n.getRow()).get(n.getCol()).getSecond();
     }
 
-    private void setNeighbors(Node n, List<Edge> neighbors) {
+    private void setNeighbors(Node n, ArrayList<Edge> neighbors) {
         graph.get(n.getRow()).get(n.getCol()).setSecond(neighbors);
     }
 
-    private List<Edge> makeNeighbors(Node source, boolean diag) {
-        List<Edge> ans = new ArrayList<>();
+    private ArrayList<Edge> makeNeighbors(Node source, boolean diag) {
+        ArrayList<Edge> ans = new ArrayList<>();
         int r = source.getRow();
         int c = source.getCol();
         boolean top = r > 0;
@@ -95,8 +96,8 @@ public class TileGraph {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (int row = 0; row < graph.size(); ++row) {
-            List<Pair<Node, List<Edge>>> list = graph.get(row);
-            for (Pair<Node, List<Edge>> p : list) {
+            List<Pair<Node, ArrayList<Edge>>> list = graph.get(row);
+            for (Pair<Node, ArrayList<Edge>> p : list) {
                 Collections.sort(p.getSecond()); //sort so that string output is consistent
                 sb.append(p.getFirst().toString());
                 sb.append(':');
@@ -129,7 +130,7 @@ public class TileGraph {
                 destNeighbors.remove(toRemove);
             }
         } else if (reachable && reachable != oldReach) {
-            List<Edge> neighbors = makeNeighbors(n, connectDiagonals);
+            ArrayList<Edge> neighbors = makeNeighbors(n, connectDiagonals);
             setNeighbors(n, neighbors);
 
             for (Edge edge : neighbors) {

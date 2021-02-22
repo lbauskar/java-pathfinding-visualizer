@@ -1,6 +1,9 @@
 package pathfinding_visualizer;
 
-public class Pair<T, U> {
+import java.io.Serializable;
+
+public class Pair<T extends Serializable, U extends Serializable> implements Serializable {
+    private static final long serialVersionUID = -8529217112653744086L;
     private T first;
     private U second;
 

@@ -1,6 +1,9 @@
 package pathfinding_visualizer;
 
-public class Edge implements Comparable<Edge> {
+import java.io.Serializable;
+
+public class Edge implements Comparable<Edge>, Serializable {
+    private static final long serialVersionUID = 4320064514277253414L;
     private Node source;
     private Node dest;
     private double weight;

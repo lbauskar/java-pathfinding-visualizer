@@ -40,7 +40,7 @@ public class Menu extends JPanel {
         yField.setText("20");
 
         JButton button = new JButton("Set Grid");
-        button.addActionListener(makeListener(String.format("resize %s %s", xField.getText(), yField.getText())));
+        button.addActionListener(messageSender(String.format("resize %s %s", xField.getText(), yField.getText())));
 
         form.add(xLabel);
         form.add(xField);
@@ -66,11 +66,11 @@ public class Menu extends JPanel {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        final JRadioButton clear = new JRadioButton("clear", true);
-        final JRadioButton wall = new JRadioButton("wall");
+        final JRadioButton clear = new JRadioButton("clear");
+        final JRadioButton wall = new JRadioButton("wall", true);
 
-        clear.addActionListener(makeListener("paint clear"));
-        wall.addActionListener(makeListener("paint wall"));
+        clear.addActionListener(messageSender("paint clear"));
+        wall.addActionListener(messageSender("paint wall"));
 
         ButtonGroup group = new ButtonGroup();
         group.add(clear);
@@ -82,7 +82,7 @@ public class Menu extends JPanel {
         return panel;
     }
 
-    ActionListener makeListener(String message) {
+    ActionListener messageSender(String message) {
         return event -> {
             try {
                 producer.sendMessage(message);

@@ -1,6 +1,9 @@
 package pathfinding_visualizer;
 
-public class Node implements Comparable<Node> {
+import java.io.Serializable;
+
+public class Node implements Comparable<Node>, Serializable {
+    private static final long serialVersionUID = -6429126713188723800L;
     private int row;
     private int col;
     private boolean reachable;
