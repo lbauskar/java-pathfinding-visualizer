@@ -11,15 +11,24 @@ public class GraphTest {
 
 
     @Test
-    public void testBasicGraphGeneration() throws IOException {
+    public void fiveByFive() throws IOException {
         FileWriter out = new FileWriter(dir + "out.txt");
         out.write(new TileGraph(5, 5, false).toString());
         out.close();
 
         boolean matches = fileEquality("out.txt", "graph_results/5x5_output.txt");
-        new File("out.txt").delete();
-
         assertTrue(matches);
+        new File("out.txt").delete();
+    }
+
+    @Test
+    public void fourByFourDiag() throws IOException {
+        FileWriter out = new FileWriter(dir + "out.txt");
+        out.write(new TileGraph(4, 4, true).toString());
+        out.close();
+
+
+        assertTrue(fileEquality("out.txt", "graph_results/4x4diag_output.txt"));
     }
 
     private boolean fileEquality(String file1, String file2) throws IOException {

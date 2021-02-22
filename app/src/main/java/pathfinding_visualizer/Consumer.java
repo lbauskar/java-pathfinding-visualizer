@@ -1,5 +1,9 @@
 package pathfinding_visualizer;
 
+import java.lang.reflect.InvocationTargetException;
+
+import javax.swing.SwingUtilities;
+
 public class Consumer extends Thread {
     protected Producer p;
     protected TileGrid grid;
@@ -14,11 +18,13 @@ public class Consumer extends Thread {
         try {
             while (true) {
                 String message = p.getMessage();
-                grid.consume(message);
+                SwingUtilities.invokeAndWait(() -> grid.consume(message)); //run on Event Dispatcher Thread
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
             Thread.currentThread().interrupt();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
         }
     }
 }

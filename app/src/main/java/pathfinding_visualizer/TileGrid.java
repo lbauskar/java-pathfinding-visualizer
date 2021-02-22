@@ -25,9 +25,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
             this.add(square);
             tiles.add(square);
 
-            int row = i / width;
             square.setBackground(Color.white);
-
         }
     }
 
@@ -94,6 +92,11 @@ public class TileGrid extends JPanel implements MouseInputListener {
     }
 
     @Override
+    public void mouseMoved(MouseEvent event) {
+        //Do nothing
+    }
+
+    @Override
     public void mouseDragged(MouseEvent event) {
         //adjust for fact tiles aren't flush with window borders
         JPanel tile = tiles.get(0);
@@ -115,11 +118,5 @@ public class TileGrid extends JPanel implements MouseInputListener {
         //color tile under cursor
         tiles.get(index).setBackground(paintColor);
     }
-
-    @Override
-    public void mouseMoved(MouseEvent event) {
-        //Do nothing
-    }
-
 
 }

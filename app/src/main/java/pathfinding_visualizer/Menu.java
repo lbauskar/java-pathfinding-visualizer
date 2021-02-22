@@ -6,7 +6,6 @@ import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.ParseException;
-import java.util.Currency;
 
 public class Menu extends JPanel {
     private static final long serialVersionUID = -2183382640701870707L;
@@ -84,16 +83,13 @@ public class Menu extends JPanel {
     }
 
     ActionListener makeListener(String message) {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                try {
-                    producer.sendMessage(message);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    Thread.currentThread().interrupt();
-                }
-			}
+        return event -> {
+            try {
+                producer.sendMessage(message);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
         };
     }
 

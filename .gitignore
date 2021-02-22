@@ -7,3 +7,6 @@ app/bin
 
 # Ignore vscode stuff
 .vscode
+
+# Ignore other stuff
+out.txt
