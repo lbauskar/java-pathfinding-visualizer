@@ -5,8 +5,6 @@ import javax.swing.event.MouseInputListener;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class TileGrid extends JPanel implements MouseInputListener {
@@ -14,8 +12,10 @@ public class TileGrid extends JPanel implements MouseInputListener {
     protected ArrayList<JPanel> tiles;
     protected int tileX;
     protected int tileY;
-    protected Color paintColor = Color.white;
+    protected Color paintColor = Color.black;
     protected TileGraph graph;
+    Pair<Integer, Integer> sourceCoord;
+    Pair<Integer, Integer> destCoord;
 
     public TileGrid(int width, int height) {
         this.addMouseMotionListener(this);
@@ -35,14 +35,17 @@ public class TileGrid extends JPanel implements MouseInputListener {
     protected void resizeGrid(int width, int height) {
         this.removeAll();
         tiles = new ArrayList<>();
-        this.tileX = width;
-        this.tileY = height;
+        tileX = width;
+        tileY = height;
 
         GridLayout layout = new GridLayout(width, height);
         this.setLayout(layout);
 
         addTiles(width, height);
         graph = new TileGraph(width, height, false);
+
+        sourceCoord = new Pair<>(0, 0);
+        destCoord = new Pair<>(tileX - 1, tileY - 1);
         this.revalidate();
     }
 
@@ -53,7 +56,12 @@ public class TileGrid extends JPanel implements MouseInputListener {
             case "resize":
                 int width = Integer.parseInt(args[1]);
                 int height = Integer.parseInt(args[2]);
-                resizeGrid(width, height);
+                if (width < 3 || width > 99 || height < 3 || height > 99) {
+                    //Do nothing
+                } else {
+                    resizeGrid(width, height);
+                }
+                
                 break;
 
             case "paint":
@@ -64,8 +72,19 @@ public class TileGrid extends JPanel implements MouseInputListener {
                 }
                 break;
 
+            case "source":
+                int x = Integer.parseInt(args[1]);
+                int y = Integer.parseInt(args[2]);
+                if (x < 0 || x >= tileX || y < 0 || y >= tileY) {
+                    // Do nothing
+                } else {
+                    tiles.get(graph.coordToIndex(x, y)).setBackground(Color.white);
+                    sourceCoord = new Pair<>(x, y);
+                }
+                break;
+
             default:
-                System.out.println("Unknown command " + command);
+                System.out.println("Unknown message " + message);
                 break;
         }
     }
@@ -108,19 +127,23 @@ public class TileGrid extends JPanel implements MouseInputListener {
         int y = event.getY() - tile.getY();
 
         //limit x and y coordinates to squares in grid
-        int maxX = tiles.get(tileX - 1).getX() + tile.getWidth() - tile.getX();
-        int maxY = tiles.get(tileX * tileY - 1).getY() + tile.getHeight() - tile.getY();
-        if (x >= maxX || x < 0 || y >= maxY || y < 0) {
-            return;
-        }
-
-        //convert pixel coordinates to tile index 
         int row = y / tile.getHeight();
         int col = x / tile.getWidth();
-        paintTile(row, col);
+
+        if (row < 0 || row >= tileY || col < 0 || col >= tileX) {
+            //Do nothing
+        } else {
+            paintTile(row, col);
+        }
     }
 
     protected void paintTile(int row, int col) {
+        Pair<Integer, Integer> coord = new Pair<>(row, col);
+        if (coord.equals(sourceCoord) || coord.equals(destCoord)) {
+            return;
+        }
+
+
         int index = graph.coordToIndex(row, col);
         graph.setNodeReachability(row, col, paintColor != Color.black);
         tiles.get(index).setBackground(paintColor);

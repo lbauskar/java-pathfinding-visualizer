@@ -1,6 +1,5 @@
 package pathfinding_visualizer;
 
-import org.checkerframework.checker.units.qual.g;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
