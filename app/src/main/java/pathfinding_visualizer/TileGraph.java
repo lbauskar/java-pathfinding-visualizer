@@ -1,9 +1,7 @@
 package pathfinding_visualizer;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class TileGraph implements Serializable {
     private static final long serialVersionUID = -4976456041837817365L;
@@ -143,5 +141,56 @@ public class TileGraph implements Serializable {
 
     public boolean diagonalsConnected() {
         return connectDiagonals;
+    }
+
+    private String reconstructPath(Map<Node, Node> prev, Node end) {
+        StringBuilder sb = new StringBuilder("path");
+        Node curr = end;
+        while (curr != null) {
+            sb.append(' ');
+            sb.append(curr.getRow());
+            sb.append(' ');
+            sb.append(curr.getCol());
+            curr = prev.get(curr);
+        }
+
+        return sb.toString();
+    }
+
+    public List<String> bfs(Pair<Integer, Integer> source, Pair<Integer, Integer> dest) {
+        List<String> actions = new LinkedList<>();
+        Node start = findNode(source.getFirst(), source.getSecond());
+        Node end = findNode(dest.getFirst(), dest.getSecond());
+
+        Queue<Node> q = new LinkedList<>();
+        Set<Node> visited = new HashSet<>();
+        Map<Node, Node> previous = new HashMap<>();
+
+        q.add(start);
+        visited.add(start);
+        previous.put(start, null);
+
+        while (!q.isEmpty()) {
+            Node curr = q.remove();
+            if (curr.equals(end)) {
+                actions.add(reconstructPath(previous, end));
+                break;
+            } else if (!curr.equals(start)) {
+                actions.add(String.format("visit %d %d", curr.getRow(), curr.getCol()));
+            }
+
+            for (Edge e : findNeighbors(curr)) {
+                Node next = e.getDest();
+                if (visited.contains(next)) {
+                    continue;
+                }
+
+                previous.put(next, curr);
+                q.add(next);
+                visited.add(next);
+            }
+        }
+
+        return actions;
     }
 }

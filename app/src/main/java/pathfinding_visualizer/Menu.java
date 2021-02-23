@@ -24,6 +24,8 @@ public class Menu extends JPanel {
         this.add(sourcePanel());
         this.add(destPanel());
         this.add(diagonalCheckbox());
+        this.add(algorithmSelector());
+        this.add(clearButton());
     }
 
     private JPanel gridSizeForm() {
@@ -57,7 +59,7 @@ public class Menu extends JPanel {
     }
 
     private JPanel paintSelector() {
-        final JRadioButton clear = new JRadioButton("clear");
+        final JRadioButton clear = new JRadioButton("erase");
         final JRadioButton wall = new JRadioButton("wall", true);
 
         clear.addActionListener(event -> {
@@ -213,7 +215,7 @@ public class Menu extends JPanel {
             }
             try {
                 int x = Integer.parseInt(s);
-                return x >= min && x < max;
+                return x >= min && x <= max;
             } catch (NumberFormatException e) {
                 return false;
             }
@@ -238,6 +240,47 @@ public class Menu extends JPanel {
 
         panel.add(label);
         panel.add(checkBox);
+        return panel;
+    }
+
+    private JPanel algorithmSelector() {
+        String[] algorithms = {"BFS"};
+        JComboBox<String> box = new JComboBox<>(algorithms);
+        JButton button = new JButton("Start");
+        button.addActionListener(
+            event -> {
+                String message = String.format("search %s", box.getSelectedItem());
+                try {
+                    producer.sendMessage(message);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                }
+            }
+        );
+
+        JPanel panel = new JPanel();
+        panel.add(box);
+        panel.add(button);
+        return panel;
+    }
+
+    private JPanel clearButton() {
+        JButton button = new JButton("Clear Grid");
+        button.addActionListener(
+            event -> {
+                String message = "clear";
+                try {
+                    producer.sendMessage(message);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                }
+            }
+        );
+
+        JPanel panel = new JPanel();
+        panel.add(button);
         return panel;
     }
 }

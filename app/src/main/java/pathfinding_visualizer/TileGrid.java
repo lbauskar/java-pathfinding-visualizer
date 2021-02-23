@@ -6,6 +6,7 @@ import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 public class TileGrid extends JPanel implements MouseInputListener {
     private static final long serialVersionUID = 2988009908866290833L; // auto-generated
@@ -23,6 +24,8 @@ public class TileGrid extends JPanel implements MouseInputListener {
         static final Color CLEAR = Color.WHITE;
         static final Color SOURCE = Color.BLUE;
         static final Color DEST = Color.RED;
+        static final Color VISIT = Color.YELLOW;
+        static final Color PATH = Color.PINK;
     }
 
     public TileGrid(int width, int height) {
@@ -41,6 +44,9 @@ public class TileGrid extends JPanel implements MouseInputListener {
     }
 
     private void resizeGrid(int width, int height) {
+        if (!(width >= 4 && width <= 99 && height >= 4 && height <= 99)) {
+            return;
+        }
         this.removeAll();
         tiles = new ArrayList<>();
         tileX = width;
@@ -68,12 +74,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
             case "resize":
                 int width = Integer.parseInt(args[1]);
                 int height = Integer.parseInt(args[2]);
-                if (width < 3 || width > 99 || height < 3 || height > 99) {
-                    //Do nothing
-                } else {
-                    resizeGrid(width, height);
-                }
-                
+                resizeGrid(width, height);
                 break;
 
             case "paint":
@@ -87,15 +88,11 @@ public class TileGrid extends JPanel implements MouseInputListener {
             case "source":
                 int x = Integer.parseInt(args[1]);
                 int y = Integer.parseInt(args[2]);
-                if (x < 0 || x >= tileX || y < 0 || y >= tileY) {
-                    // Do nothing
-                } else {
-                    changeSource(x, y);
-                }
+                changeSource(x, y);
                 break;
 
             case "diagonal":
-                connectDiagonals = args[1].equals("true") ? true : false;
+                connectDiagonals = args[1].equals("true");
                 if (connectDiagonals != graph.diagonalsConnected()) {
                     makeGraph(connectDiagonals);
                 }
@@ -104,17 +101,75 @@ public class TileGrid extends JPanel implements MouseInputListener {
             case "destination":
                 x = Integer.parseInt(args[1]);
                 y = Integer.parseInt(args[2]);
-                if (x < 0 || x >= tileX || y < 0 || y >= tileY) {
-                    // Do nothing
-                } else {
-                    changeDest(x, y);
+                changeDest(x, y);
+                break;
+
+            case "search":
+                String algorithm = args[1];
+                if (algorithm.equals("BFS")) {
+                    visualizeAlgorithm(graph.bfs(sourceCoord, destCoord));
                 }
                 break;
+
+            case "clear":
+                clearGrid();
+                break;
+
 
             default:
                 System.out.println("Unknown message " + message);
                 break;
         }
+    }
+
+    private void clearGrid() {
+        for (JPanel tile : tiles) {
+            Color bg = tile.getBackground();
+            if (bg == Pallete.VISIT || bg == Pallete.PATH) {
+                tile.setBackground(Pallete.CLEAR);
+            }
+        }
+    }
+
+    private void visualizeAlgorithm(List<String> actions) {
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                for (String action : actions) {
+                   /* try {
+                        sleep(milliDelay, 0);
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                        Thread.currentThread().interrupt();
+                    }*/
+                    String[] args = action.split(" ");
+                    if (args[0].equals("visit")) {
+                        try {
+                            int x = Integer.parseInt(args[1]);
+                            int y = Integer.parseInt(args[2]);
+                            SwingUtilities.invokeLater(
+                                () -> tiles.get(graph.coordToIndex(x, y)).setBackground(Pallete.VISIT)
+                            );
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        try {
+                            for (int i = 3; i < args.length - 2; i += 2) {
+                                int x = Integer.parseInt(args[i]);
+                                int y = Integer.parseInt(args[i + 1]);
+                                SwingUtilities.invokeLater(
+                                    () -> tiles.get(graph.coordToIndex(x, y)).setBackground(Pallete.PATH)
+                                );
+                            }
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        };
+        t.start();
     }
 
     @Override
@@ -178,14 +233,18 @@ public class TileGrid extends JPanel implements MouseInputListener {
     }
 
     private void changeSource(int x, int y) {
-        tiles.get(graph.coordToIndex(sourceCoord.getFirst(), sourceCoord.getSecond())).setBackground(Pallete.CLEAR);
-        tiles.get(graph.coordToIndex(x, y)).setBackground(Pallete.SOURCE);
-        sourceCoord = new Pair<>(x, y);
+        if (x >= 0 && x < tileX && y >= 0 && y < tileY) {
+            tiles.get(graph.coordToIndex(sourceCoord.getFirst(), sourceCoord.getSecond())).setBackground(Pallete.CLEAR);
+            tiles.get(graph.coordToIndex(x, y)).setBackground(Pallete.SOURCE);
+            sourceCoord = new Pair<>(x, y);
+        }
     }
 
     private void changeDest(int x, int y) {
-        tiles.get(graph.coordToIndex(destCoord.getFirst(), destCoord.getSecond())).setBackground(Pallete.CLEAR);
-        tiles.get(graph.coordToIndex(x, y)).setBackground(Pallete.DEST);
-        sourceCoord = new Pair<>(x, y);
+        if (x >= 0 && x < tileX && y >= 0 && y < tileY) {
+            tiles.get(graph.coordToIndex(destCoord.getFirst(), destCoord.getSecond())).setBackground(Pallete.CLEAR);
+            tiles.get(graph.coordToIndex(x, y)).setBackground(Pallete.DEST);
+            destCoord = new Pair<>(x, y);
+        }  
     }
 }
