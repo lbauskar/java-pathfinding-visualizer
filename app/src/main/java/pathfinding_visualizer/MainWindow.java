@@ -3,11 +3,21 @@ package pathfinding_visualizer;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The window this app runs in. 
+ */
 public class MainWindow extends JFrame {
     private static final long serialVersionUID = 8073827579515641067L; // auto-generated
 
-    JLayeredPane pane;
+    private JLayeredPane pane;
 
+    /**
+     * Creates a window holding a single pane that is {@code width} by {@code height} in pixels.
+     * The pane has a {@link Menu} on the left and a {@link TileGrid} on the right.
+     * 
+     * @param width how many pixels wide the window is
+     * @param height how many pixels tall the window is
+     */
     public MainWindow(int width, int height) {
 
         // initialize pane

@@ -10,3 +10,6 @@ app/bin
 
 # Ignore output test files
 **/out.txt
+
+# Ignore file used to access local docs
+index.html

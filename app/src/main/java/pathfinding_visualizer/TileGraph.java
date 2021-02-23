@@ -3,6 +3,9 @@ package pathfinding_visualizer;
 import java.io.Serializable;
 import java.util.*;
 
+/**
+ * Mathematical graph that should correspond to the tiles in the parent {@link TileGrid}.
+ */
 public class TileGraph implements Serializable {
     private static final long serialVersionUID = -4976456041837817365L;
     private int width;
@@ -47,17 +50,17 @@ public class TileGraph implements Serializable {
     }
 
     private List<Edge> findNeighbors(Node n) {
-        return graph.get(n.getRow()).get(n.getCol()).second;
+        return graph.get(n.row).get(n.col).second;
     }
 
     private void setNeighbors(Node n, ArrayList<Edge> neighbors) {
-        graph.get(n.getRow()).get(n.getCol()).second = neighbors;
+        graph.get(n.row).get(n.col).second = neighbors;
     }
 
     private ArrayList<Edge> makeNeighbors(Node source) {
         ArrayList<Edge> edgeList = new ArrayList<>();
-        int r = source.getRow();
-        int c = source.getCol();
+        int r = source.row;
+        int c = source.col;
         boolean top = r > 0;
         boolean bottom = r < height - 1;
         boolean left = c > 0;
@@ -104,7 +107,7 @@ public class TileGraph implements Serializable {
     }
 
     private void tryAddingEdge(Node source, Node dest, List<Edge> edgeList) {
-        if (source.isReachable() && dest.isReachable()) {
+        if (source.reachable && dest.reachable) {
             edgeList.add(new Edge(source, dest));
         }
     }
@@ -127,19 +130,19 @@ public class TileGraph implements Serializable {
 
     public void setNodeReachability(int row, int col, boolean reachable) {
         Node n = findNode(row, col);
-        boolean oldReach = n.isReachable();
-        n.setReachable(reachable);
+        boolean oldReach = n.reachable;
+        n.reachable = reachable;
 
         if (!reachable && reachable != oldReach) {
             List<Edge> neighbors = findNeighbors(n);
             setNeighbors(n, new ArrayList<>());
 
             for (Edge edge : neighbors) {
-                Node dest = edge.getDest();
+                Node dest = edge.dest;
                 List<Edge> destNeighbors = findNeighbors(dest);
                 Edge toRemove = null;
                 for (Edge destEdge : destNeighbors) {
-                    if (destEdge.getDest() == n) {
+                    if (destEdge.dest == n) {
                         toRemove = destEdge;
                         break;
                     }
@@ -151,8 +154,8 @@ public class TileGraph implements Serializable {
             setNeighbors(n, neighbors);
 
             for (Edge edge : neighbors) {
-                Node dest = edge.getDest();
-                Edge destEdge = new Edge(dest, n, edge.getWeight());
+                Node dest = edge.dest;
+                Edge destEdge = new Edge(dest, n, edge.weight);
                 findNeighbors(dest).add(destEdge);
             }
         }
@@ -167,9 +170,9 @@ public class TileGraph implements Serializable {
         Node curr = end;
         while (curr != null) {
             sb.append(' ');
-            sb.append(curr.getRow());
+            sb.append(curr.row);
             sb.append(' ');
-            sb.append(curr.getCol());
+            sb.append(curr.col);
             curr = prev.get(curr);
         }
 
@@ -195,11 +198,11 @@ public class TileGraph implements Serializable {
                 actions.add(reconstructPath(previous, end));
                 break;
             } else if (!curr.equals(start)) {
-                actions.add(String.format("visit %d %d", curr.getRow(), curr.getCol()));
+                actions.add(String.format("visit %d %d", curr.row, curr.col));
             }
 
             for (Edge e : findNeighbors(curr)) {
-                Node next = e.getDest();
+                Node next = e.dest;
                 if (visited.contains(next)) {
                     continue;
                 }

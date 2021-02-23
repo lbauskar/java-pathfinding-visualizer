@@ -2,55 +2,69 @@ package pathfinding_visualizer;
 
 import java.io.Serializable;
 
+/**
+ * Representation of a graph's node or vertex.
+ */
 public class Node implements Comparable<Node>, Serializable {
     private static final long serialVersionUID = -6429126713188723800L;
-    private int row;
-    private int col;
-    private boolean reachable;
+    /**
+     * Row of 2D array this is in
+     */
+    public int row;
+    /**
+     * Column of 2D array this is in
+     */
+    public int col;
+    /**
+     * Whether other edges should be able to have this as a destination node or whether this has neighbors
+     */
+    public boolean reachable;
 
+
+    /**
+     * Creates Node that may or may not be reachable.
+     * 
+     * @param row row of 2D array this is in
+     * @param col column of 2D array this is in 
+     * @param reachable whether an edge should be able to have this as a destination
+     */
     public Node(int row, int col, boolean reachable) {
-        this.setRow(row);
-        this.setCol(col);
+        this.row = row;
+        this.col = col;
         this.reachable = reachable;
     }
 
-    public int getCol() {
-        return col;
-    }
-
-    public void setCol(int col) {
-        this.col = col;
-    }
-
-    public int getRow() {
-        return row;
-    }
-
-    public void setRow(int row) {
-        this.row = row;
-    }
-
+    /**
+     * Creates Node that is reachable.
+     * 
+     * @param row row of 2D array this is in
+     * @param col column of 2D array this is in
+     */
     public Node(int row, int col) {
         this(row, col, true);
     }
 
-    public boolean isReachable() {
-        return reachable;
-    }
-    
-    public void setReachable(boolean reachable) {
-        this.reachable = reachable;
-    }
-
+    /**
+     * {@inheritDoc}
+     * 
+     * @return String representation of this Node - {@code "(row, col)"}
+     */
     @Override
     public String toString() {
         return String.format("(%s, %s)", row, col);
     }
 
+    /**
+     * Compares {@code this} Node to the {@code other} Node on the basis of their {@code row}
+     * field, then their {@code col} field - if necessary.
+     * 
+     * @return -1 if {@code this} is less than {@code other}, 0 if {@code this} equals {@code other},
+     * or 1 if {@code this} is greater than {@code other}
+     */
     @Override
     public int compareTo(Node other) {
-        int rowComp = ((Integer) this.row).compareTo(other.getRow());
-        int colComp = ((Integer) this.col).compareTo(other.getCol());
+        int rowComp = ((Integer) this.row).compareTo(other.row);
+        int colComp = ((Integer) this.col).compareTo(other.row);
         if (rowComp == 0) {
             return colComp;
         } else {
@@ -58,6 +72,13 @@ public class Node implements Comparable<Node>, Serializable {
         }
     }
 
+    /**
+     * Checks if the {@code other} object is also a {@code Node}, then if {@code this}
+     * and {@code other} have equal {@code row}, {@code col}, and {@code reachable} values.
+     * 
+     * @return {@code true} if {@code other} is the same class as {@code this}, and
+     * all of their fields are equal
+     */
     @Override
     public boolean equals(Object other) {
         if (other == null) {
@@ -66,16 +87,22 @@ public class Node implements Comparable<Node>, Serializable {
             return false;
         } else {
             Node n = (Node) other;
-            boolean rowEqual = this.row == n.getRow();
-            boolean colEqual = this.col == n.getCol();
-            boolean reachEqual = this.reachable == n.isReachable();
+            boolean rowEqual = this.row == n.row;
+            boolean colEqual = this.col == n.col;
+            boolean reachEqual = this.reachable == n.reachable;
 
             return rowEqual && colEqual && reachEqual;
         }
     }
 
+    /**
+     * Hashes the string representation of this Node.
+     * 
+     * @return hash code of string representation
+     */
     @Override
     public int hashCode() {
-        return this.toString().hashCode();
+        char reachChar = reachable ? 't' : 'f';
+        return (this.toString() + reachChar).hashCode();
     }
 }

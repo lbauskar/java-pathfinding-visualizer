@@ -1,6 +1,6 @@
 # Pathfinding Visualizer
 
-This is an updated version of an old pathfinding visualizer I wrote in C++ a long-ish time ago. That program no longer works due to some linking mistakes I made with the SFML library. 
+This is an updated version of an old pathfinding visualizer I wrote in C++ a long time ago. That program no longer works due to some linking mistakes I made with the SFML library. 
 
 This new visualizer is written in Java, so I can keep the language fresh in my memory.
 

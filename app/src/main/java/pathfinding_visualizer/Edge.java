@@ -2,56 +2,68 @@ package pathfinding_visualizer;
 
 import java.io.Serializable;
 
+/**
+ * Representation of a graph's edge.
+ */
 public class Edge implements Comparable<Edge>, Serializable {
     private static final long serialVersionUID = 4320064514277253414L;
-    private Node source;
-    private Node dest;
-    private double weight;
+    /**
+     * Node this Edge is leaving (source node)
+     */
+    public Node source;
+    /**
+     * Node this Edge is going towards (destination node)
+     */
+    public Node dest;
+    /**
+     * The cost of traversing this Edge
+     */
+    public double weight;
 
-    Edge(Node a, Node b) {
-        this(a, b, 1);
+    /**
+     * Creates a directed edge from a source node to a destination node with a weight of 1.
+     * @param source source node
+     * @param dest destination node
+     */
+    public Edge(Node source, Node dest) {
+        this(source, dest, 1);
     }
 
-    public double getWeight() {
-        return weight;
-    }
-
-    public void setWeight(double weight) {
+    /**
+     * Creates a directed edge from a source node to a destination node with a custom weight.
+     * 
+     * @param source source node 
+     * @param dest destination node
+     * @param weight weight of the edge
+     */
+    public Edge(Node source, Node dest, double weight) {
+        this.source = source;
+        this.dest = dest;
         this.weight = weight;
     }
 
-    public Node getDest() {
-        return dest;
-    }
-
-    public void setDest(Node dest) {
-        this.dest = dest;
-    }
-
-    public Node getSource() {
-        return source;
-    }
-
-    public void setSource(Node source) {
-        this.source = source;
-    }
-
-    public Edge(Node source, Node dest, double weight) {
-        this.setSource(source);
-        this.setDest(dest);
-        this.setWeight(weight);
-    }
-
+    /**
+     * {@inheritDoc}
+     * 
+     * @return String representation of this edge - {@code "(source, dest, weight)"}
+     */
     @Override
     public String toString() {
         return String.format("(%s, %s, %f)", source, dest, weight);
     }
 
+    /**
+     * Compares this edge to the {@code other} by comparing the source node,
+     * the destination node, and the edge weight in that order.
+     * 
+     * @param other the Edge being compared to
+     * @return -1 if less than other, 0 if equal, and 1 if greater than other
+     */
     @Override
     public int compareTo(Edge other) {
-        int sourceComp = this.source.compareTo(other.getSource());
-        int destComp = this.dest.compareTo(other.getDest());
-        int weightComp = ((Double)this.weight).compareTo(other.getWeight());
+        int sourceComp = this.source.compareTo(other.source);
+        int destComp = this.dest.compareTo(other.dest);
+        int weightComp = ((Double)this.weight).compareTo(other.weight);
 
         if (sourceComp == 0 && destComp == 0) {
             return weightComp;
@@ -62,6 +74,14 @@ public class Edge implements Comparable<Edge>, Serializable {
         }
     }
 
+    /**
+     * Checks if {@code other} is an Edge, then checks if the values of 
+     * {@code source}, {@code dest}, and {@code weight} are equal 
+     * across both Edges.
+     * 
+     * @param other the Object being compared to
+     * @return true if {@code other} is an Edge with the same fields as this Edge, false otherwise
+     */
     @Override
     public boolean equals(Object other) {
         if (other == null) {
@@ -70,13 +90,16 @@ public class Edge implements Comparable<Edge>, Serializable {
             return false;
         } else {
             Edge e = (Edge) other;
-            boolean sourceEqual = this.source.equals(e.getSource());
-            boolean destEqual = this.dest.equals(e.getDest());
-            boolean weightEqual = this.weight == e.getWeight();
+            boolean sourceEqual = this.source.equals(e.source);
+            boolean destEqual = this.dest.equals(e.dest);
+            boolean weightEqual = this.weight == e.weight;
             return sourceEqual && destEqual && weightEqual;
         }
     }
 
+    /**
+     * @return hash code of this Edge's String representation
+     */
     @Override
     public int hashCode() {
         return toString().hashCode();
