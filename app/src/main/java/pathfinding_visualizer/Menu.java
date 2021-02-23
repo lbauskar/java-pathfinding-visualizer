@@ -23,6 +23,7 @@ public class Menu extends JPanel {
         this.add(gridSizeForm());
         this.add(paintSelector());
         this.add(sourcePanel());
+        this.add(diagonalCheckbox());
     }
 
     protected JPanel gridSizeForm() {
@@ -44,8 +45,7 @@ public class Menu extends JPanel {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
             }
-            }
-        );
+        });
 
         form.add(xLabel);
         form.add(xField);
@@ -60,28 +60,24 @@ public class Menu extends JPanel {
         final JRadioButton clear = new JRadioButton("clear");
         final JRadioButton wall = new JRadioButton("wall", true);
 
-        clear.addActionListener(
-            event -> {
-                String message = "paint clear";
-                try {
-                    producer.sendMessage(message);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    Thread.currentThread().interrupt();
-                }
+        clear.addActionListener(event -> {
+            String message = "paint clear";
+            try {
+                producer.sendMessage(message);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
-        );
-        wall.addActionListener(
-            event -> {
-                String message = "paint wall";
-                try {
-                    producer.sendMessage(message);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    Thread.currentThread().interrupt();
-                }
+        });
+        wall.addActionListener(event -> {
+            String message = "paint wall";
+            try {
+                producer.sendMessage(message);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
-        );
+        });
 
         ButtonGroup group = new ButtonGroup();
         group.add(clear);
@@ -113,9 +109,7 @@ public class Menu extends JPanel {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
             }
-            }
-        );
-
+        });
 
         JPanel panel = new JPanel();
         panel.setBackground(bg);
@@ -193,5 +187,26 @@ public class Menu extends JPanel {
                 return false;
             }
         }
+    }
+
+    private JPanel diagonalCheckbox() {
+        JPanel panel = new JPanel();
+        JLabel label = new JLabel("Allow Diagonal Movement: ");
+        JCheckBox checkBox = new JCheckBox();
+        checkBox.addActionListener(
+            event -> {
+                String message = String.format("diagonal %b", checkBox.isSelected());
+                try {
+                    producer.sendMessage(message);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                }
+            }
+        );
+
+        panel.add(label);
+        panel.add(checkBox);
+        return panel;
     }
 }

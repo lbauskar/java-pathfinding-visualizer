@@ -9,20 +9,27 @@ import java.util.ArrayList;
 
 public class TileGrid extends JPanel implements MouseInputListener {
     private static final long serialVersionUID = 2988009908866290833L; // auto-generated
-    protected ArrayList<JPanel> tiles;
-    protected int tileX;
-    protected int tileY;
-    protected Color paintColor = Color.black;
-    protected TileGraph graph;
-    Pair<Integer, Integer> sourceCoord;
-    Pair<Integer, Integer> destCoord;
+    private ArrayList<JPanel> tiles;
+    private int tileX;
+    private int tileY;
+    private Color paintColor = Color.black;
+    private TileGraph graph;
+    private Pair<Integer, Integer> sourceCoord;
+    private Pair<Integer, Integer> destCoord;
+    private boolean connectDiagonals = false;
+
+    private static class Pallete {
+        static final Color WALL = Color.black;
+        static final Color CLEAR = Color.white;
+        static final Color SOURCE = Color.blue;
+    }
 
     public TileGrid(int width, int height) {
         this.addMouseMotionListener(this);
         resizeGrid(width, height);
     }
 
-    protected void addTiles(int width, int height) {
+    private void addTiles(int width, int height) {
         for (int i = 0; i < width * height; ++i) {
             JPanel square = new JPanel();
             this.add(square);
@@ -32,7 +39,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
         }
     }
 
-    protected void resizeGrid(int width, int height) {
+    private void resizeGrid(int width, int height) {
         this.removeAll();
         tiles = new ArrayList<>();
         tileX = width;
@@ -42,11 +49,15 @@ public class TileGrid extends JPanel implements MouseInputListener {
         this.setLayout(layout);
 
         addTiles(width, height);
-        graph = new TileGraph(width, height, false);
+        makeGraph(connectDiagonals);
 
         sourceCoord = new Pair<>(0, 0);
         destCoord = new Pair<>(tileX - 1, tileY - 1);
         this.revalidate();
+    }
+
+    private void makeGraph(boolean diag) {
+        graph = new TileGraph(tileX, tileY, diag);
     }
 
     public void consume(String message) {
@@ -66,9 +77,9 @@ public class TileGrid extends JPanel implements MouseInputListener {
 
             case "paint":
                 if (args[1].equals("clear")) {
-                    paintColor = Color.white;
+                    paintColor = Pallete.CLEAR;
                 } else {
-                    paintColor = Color.black;
+                    paintColor = Pallete.WALL;
                 }
                 break;
 
@@ -80,6 +91,13 @@ public class TileGrid extends JPanel implements MouseInputListener {
                 } else {
                     tiles.get(graph.coordToIndex(x, y)).setBackground(Color.white);
                     sourceCoord = new Pair<>(x, y);
+                }
+                break;
+
+            case "diagonal":
+                connectDiagonals = args[1].equals("true") ? true : false;
+                if (connectDiagonals != graph.diagonalsConnected()) {
+                    makeGraph(connectDiagonals);
                 }
                 break;
 
@@ -137,7 +155,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
         }
     }
 
-    protected void paintTile(int row, int col) {
+    private void paintTile(int row, int col) {
         Pair<Integer, Integer> coord = new Pair<>(row, col);
         if (coord.equals(sourceCoord) || coord.equals(destCoord)) {
             return;

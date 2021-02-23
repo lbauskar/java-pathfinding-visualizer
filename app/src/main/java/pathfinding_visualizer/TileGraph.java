@@ -140,4 +140,8 @@ public class TileGraph implements Serializable {
             }
         }
     }
+
+    public boolean diagonalsConnected() {
+        return connectDiagonals;
+    }
 }
