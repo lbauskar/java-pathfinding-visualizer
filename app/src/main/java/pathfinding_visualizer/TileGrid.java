@@ -14,14 +14,15 @@ public class TileGrid extends JPanel implements MouseInputListener {
     private int tileY;
     private Color paintColor = Color.black;
     private TileGraph graph;
-    private Pair<Integer, Integer> sourceCoord;
-    private Pair<Integer, Integer> destCoord;
+    private Pair<Integer, Integer> sourceCoord = new Pair<>(0, 0);
+    private Pair<Integer, Integer> destCoord = new Pair<>(19, 19);
     private boolean connectDiagonals = false;
 
-    private static class Pallete {
-        static final Color WALL = Color.black;
-        static final Color CLEAR = Color.white;
-        static final Color SOURCE = Color.blue;
+    private static final class Pallete {
+        static final Color WALL = Color.BLACK;
+        static final Color CLEAR = Color.WHITE;
+        static final Color SOURCE = Color.BLUE;
+        static final Color DEST = Color.RED;
     }
 
     public TileGrid(int width, int height) {
@@ -51,8 +52,8 @@ public class TileGrid extends JPanel implements MouseInputListener {
         addTiles(width, height);
         makeGraph(connectDiagonals);
 
-        sourceCoord = new Pair<>(0, 0);
-        destCoord = new Pair<>(tileX - 1, tileY - 1);
+        changeSource(0, 0);
+        changeDest(tileX - 1, tileY - 1);
         this.revalidate();
     }
 
@@ -89,8 +90,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
                 if (x < 0 || x >= tileX || y < 0 || y >= tileY) {
                     // Do nothing
                 } else {
-                    tiles.get(graph.coordToIndex(x, y)).setBackground(Color.white);
-                    sourceCoord = new Pair<>(x, y);
+                    changeSource(x, y);
                 }
                 break;
 
@@ -98,6 +98,16 @@ public class TileGrid extends JPanel implements MouseInputListener {
                 connectDiagonals = args[1].equals("true") ? true : false;
                 if (connectDiagonals != graph.diagonalsConnected()) {
                     makeGraph(connectDiagonals);
+                }
+                break;
+
+            case "destination":
+                x = Integer.parseInt(args[1]);
+                y = Integer.parseInt(args[2]);
+                if (x < 0 || x >= tileX || y < 0 || y >= tileY) {
+                    // Do nothing
+                } else {
+                    changeDest(x, y);
                 }
                 break;
 
@@ -165,5 +175,17 @@ public class TileGrid extends JPanel implements MouseInputListener {
         int index = graph.coordToIndex(row, col);
         graph.setNodeReachability(row, col, paintColor != Color.black);
         tiles.get(index).setBackground(paintColor);
+    }
+
+    private void changeSource(int x, int y) {
+        tiles.get(graph.coordToIndex(sourceCoord.getFirst(), sourceCoord.getSecond())).setBackground(Pallete.CLEAR);
+        tiles.get(graph.coordToIndex(x, y)).setBackground(Pallete.SOURCE);
+        sourceCoord = new Pair<>(x, y);
+    }
+
+    private void changeDest(int x, int y) {
+        tiles.get(graph.coordToIndex(destCoord.getFirst(), destCoord.getSecond())).setBackground(Pallete.CLEAR);
+        tiles.get(graph.coordToIndex(x, y)).setBackground(Pallete.DEST);
+        sourceCoord = new Pair<>(x, y);
     }
 }

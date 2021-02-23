@@ -6,8 +6,7 @@ import java.awt.*;
 
 public class Menu extends JPanel {
     private static final long serialVersionUID = -2183382640701870707L;
-    protected Color bg = Color.blue;
-    protected Color text = Color.white;
+    private Color bg = Color.blue;
     private Producer producer;
 
     public Menu(Producer producer) {
@@ -23,10 +22,11 @@ public class Menu extends JPanel {
         this.add(gridSizeForm());
         this.add(paintSelector());
         this.add(sourcePanel());
+        this.add(destPanel());
         this.add(diagonalCheckbox());
     }
 
-    protected JPanel gridSizeForm() {
+    private JPanel gridSizeForm() {
         JPanel form = new JPanel();
         form.setBackground(bg);
 
@@ -56,7 +56,7 @@ public class Menu extends JPanel {
         return form;
     }
 
-    protected JPanel paintSelector() {
+    private JPanel paintSelector() {
         final JRadioButton clear = new JRadioButton("clear");
         final JRadioButton wall = new JRadioButton("wall", true);
 
@@ -92,7 +92,7 @@ public class Menu extends JPanel {
         return panel;
     }
 
-    protected JPanel sourcePanel() {
+    private JPanel sourcePanel() {
         JLabel l1 = new JLabel("Source: (");
         JLabel l2 = new JLabel(",");
         JLabel l3 = new JLabel(")");
@@ -102,6 +102,37 @@ public class Menu extends JPanel {
         JButton button = new JButton("Set Source");
         button.addActionListener(event -> {
             String message = String.format("source %s %s", xField.getText().isEmpty() ? "0" : xField.getText(),
+                    yField.getText().isEmpty() ? "0" : yField.getText());
+            try {
+                producer.sendMessage(message);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        JPanel panel = new JPanel();
+        panel.setBackground(bg);
+        panel.add(l1);
+        panel.add(xField);
+        panel.add(l2);
+        panel.add(yField);
+        panel.add(l3);
+        panel.add(button);
+
+        return panel;
+    }
+
+    private JPanel destPanel() {
+        JLabel l1 = new JLabel("Destination: (");
+        JLabel l2 = new JLabel(",");
+        JLabel l3 = new JLabel(")");
+        JTextField xField = makeIntTextField(0, 99, 2, 19);
+        JTextField yField = makeIntTextField(0, 99, 2, 19);
+
+        JButton button = new JButton("Set Destination");
+        button.addActionListener(event -> {
+            String message = String.format("destination %s %s", xField.getText().isEmpty() ? "0" : xField.getText(),
                     yField.getText().isEmpty() ? "0" : yField.getText());
             try {
                 producer.sendMessage(message);
