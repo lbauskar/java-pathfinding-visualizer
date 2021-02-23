@@ -26,68 +26,87 @@ public class TileGraph implements Serializable {
         makeEdges();
     }
 
-    public void makeEdges() {
+    private void makeEdges() {
         for (int row = 0; row < height; ++row) {
             for (int col = 0; col < width; ++col) {
-                setNeighbors(findNode(row, col), makeNeighbors(findNode(row, col), connectDiagonals));
+                graph.get(row).get(col).second = makeNeighbors(findNode(row, col));
             }
         }
     }
 
-    public int coordToIndex(int r, int c) {
-        return r * height + c;
+    public void makeEdges(boolean connectDiagonals) {
+        if (connectDiagonals == this.connectDiagonals) {
+            return;
+        }
+        this.connectDiagonals = connectDiagonals;
+        makeEdges();
     }
 
     private Node findNode(int row, int col) {
-        return graph.get(row).get(col).getFirst();
+        return graph.get(row).get(col).first;
     }
 
     private List<Edge> findNeighbors(Node n) {
-        return graph.get(n.getRow()).get(n.getCol()).getSecond();
+        return graph.get(n.getRow()).get(n.getCol()).second;
     }
 
     private void setNeighbors(Node n, ArrayList<Edge> neighbors) {
-        graph.get(n.getRow()).get(n.getCol()).setSecond(neighbors);
+        graph.get(n.getRow()).get(n.getCol()).second = neighbors;
     }
 
-    private ArrayList<Edge> makeNeighbors(Node source, boolean diag) {
-        ArrayList<Edge> ans = new ArrayList<>();
+    private ArrayList<Edge> makeNeighbors(Node source) {
+        ArrayList<Edge> edgeList = new ArrayList<>();
         int r = source.getRow();
         int c = source.getCol();
         boolean top = r > 0;
         boolean bottom = r < height - 1;
         boolean left = c > 0;
         boolean right = c < width - 1;
+        boolean diag = connectDiagonals;
+        Node dest;
 
         if (diag && top && left) {
-            ans.add(new Edge(source, findNode(r - 1, c - 1)));
+            dest = findNode(r - 1, c -1);
+            tryAddingEdge(source, dest, edgeList);
         }
         if (top) {
-            ans.add(new Edge(source, findNode(r - 1, c)));
+            dest = findNode(r - 1, c);
+            tryAddingEdge(source, dest, edgeList);
         }
         if (diag && top && right) {
-            ans.add(new Edge(source, findNode(r - 1, c + 1)));
+            dest = findNode(r - 1, c + 1);
+            tryAddingEdge(source, dest, edgeList);
         }
 
         if (left) {
-            ans.add(new Edge(source, findNode(r, c - 1)));
+            dest = findNode(r, c - 1);
+            tryAddingEdge(source, dest, edgeList);
         }
         if (right) {
-            ans.add(new Edge(source, findNode(r, c + 1)));
+            dest = findNode(r, c + 1);
+            tryAddingEdge(source, dest, edgeList);
         }
 
         if (diag && bottom && left) {
-            ans.add(new Edge(source, findNode(r + 1, c - 1)));
+            dest = findNode(r + 1, c - 1);
+            tryAddingEdge(source, dest, edgeList);
         }
         if (bottom) {
-            ans.add(new Edge(source, findNode(r + 1, c)));
+            dest = findNode(r + 1, c);
+            tryAddingEdge(source, dest, edgeList);
         }
         if (diag && bottom && right) {
-            ans.add(new Edge(source, findNode(r + 1, c + 1)));
+            dest = findNode(r + 1, c + 1);
+            tryAddingEdge(source, dest, edgeList);
         }
 
+        return edgeList;
+    }
 
-        return ans;
+    private void tryAddingEdge(Node source, Node dest, List<Edge> edgeList) {
+        if (source.isReachable() && dest.isReachable()) {
+            edgeList.add(new Edge(source, dest));
+        }
     }
 
     @Override
@@ -96,10 +115,10 @@ public class TileGraph implements Serializable {
         for (int row = 0; row < graph.size(); ++row) {
             List<Pair<Node, ArrayList<Edge>>> list = graph.get(row);
             for (Pair<Node, ArrayList<Edge>> p : list) {
-                Collections.sort(p.getSecond()); //sort so that string output is consistent
-                sb.append(p.getFirst().toString());
+                Collections.sort(p.second); //sort so that string output is consistent
+                sb.append(p.first.toString());
                 sb.append(':');
-                sb.append(p.getSecond().toString());
+                sb.append(p.second.toString());
                 sb.append('\n');
             }
         }
@@ -128,7 +147,7 @@ public class TileGraph implements Serializable {
                 destNeighbors.remove(toRemove);
             }
         } else if (reachable && reachable != oldReach) {
-            ArrayList<Edge> neighbors = makeNeighbors(n, connectDiagonals);
+            ArrayList<Edge> neighbors = makeNeighbors(n);
             setNeighbors(n, neighbors);
 
             for (Edge edge : neighbors) {
@@ -159,8 +178,8 @@ public class TileGraph implements Serializable {
 
     public List<String> bfs(Pair<Integer, Integer> source, Pair<Integer, Integer> dest) {
         List<String> actions = new LinkedList<>();
-        Node start = findNode(source.getFirst(), source.getSecond());
-        Node end = findNode(dest.getFirst(), dest.getSecond());
+        Node start = findNode(source.first, source.second);
+        Node end = findNode(dest.first, dest.second);
 
         Queue<Node> q = new LinkedList<>();
         Set<Node> visited = new HashSet<>();
