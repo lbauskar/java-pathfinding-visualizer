@@ -409,8 +409,9 @@ public class TileGrid extends JPanel implements MouseInputListener {
     }
 
     /**
-     * Works like {@link #changeSource} but applies to {@code destCoord} instead. 
-     * The destination tile is the location the pathfinding algorithm will try to reach.
+     * Changes where the destination tile is.
+     * 
+     * @see #changeSource
      * @param row row of new destination tile location
      * @param col column of new destination tile location
      */
