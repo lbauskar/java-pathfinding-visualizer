@@ -22,8 +22,8 @@ public class Edge implements Comparable<Edge>, Serializable {
 
     /**
      * Creates a directed edge from a source node to a destination node with a weight of 1.
-     * @param source source node
-     * @param dest destination node
+     * @param source Node this edge is leaving
+     * @param dest Node this edge is going towards
      */
     public Edge(Node source, Node dest) {
         this(source, dest, 1);
@@ -32,9 +32,9 @@ public class Edge implements Comparable<Edge>, Serializable {
     /**
      * Creates a directed edge from a source node to a destination node with a custom weight.
      * 
-     * @param source source node 
-     * @param dest destination node
-     * @param weight weight of the edge
+     * @param source Node this edge is leaving
+     * @param dest Node this edge is going towards
+     * @param weight double value for the weight of this edge
      */
     public Edge(Node source, Node dest, double weight) {
         this.source = source;
@@ -56,7 +56,7 @@ public class Edge implements Comparable<Edge>, Serializable {
      * Compares this edge to the {@code other} by comparing the source node,
      * the destination node, and the edge weight in that order.
      * 
-     * @param other the Edge being compared to
+     * @param other Edge being compared to
      * @return -1 if less than other, 0 if equal, and 1 if greater than other
      */
     @Override
@@ -79,7 +79,7 @@ public class Edge implements Comparable<Edge>, Serializable {
      * {@code source}, {@code dest}, and {@code weight} are equal 
      * across both Edges.
      * 
-     * @param other the Object being compared to
+     * @param other Object being compared to
      * @return true if {@code other} is an Edge with the same fields as this Edge, false otherwise
      */
     @Override

@@ -41,7 +41,7 @@ public class Producer implements Serializable {
      * function will wait for the message queue to get smaller before adding the new message.
      * 
      * @param message String to send to another thread
-     * @throws InterruptedException if the function waits too long
+     * @throws InterruptedException the function waited too long and got interrupted
      */
     public synchronized void sendMessage(String message) throws InterruptedException {
         while (messageQueue.size() >= MAX_QUEUE_SIZE) {

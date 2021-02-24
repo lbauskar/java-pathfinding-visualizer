@@ -178,9 +178,9 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * <li> "clear" - calls {@link #clearGrid}
      * </ul>
      * 
-     * @param message a String sent to the parent Consumer
-     * @throws NumberFormatException if the message parameter is not a valid command
-     * @throws IndexOutOfBoundsException if the message parameter is not a valid command
+     * @param message String sent to the parent Consumer
+     * @throws NumberFormatException {@code message} is not a valid command
+     * @throws IndexOutOfBoundsException {@code message} is not a valid command
      */
     public void consume(String message) {
         String[] args = message.split(" ");
@@ -275,10 +275,10 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * <li> 'path x1 y1 x2 y2 ...' where the x and y values are coordinates of each tile part of the final, optimal path
      * </ol>
      * 
-     * @param actions a List of Strings that tells the function what a pathfinding algorithm did for each iteration
+     * @param actions List of Strings that tells the function what a pathfinding algorithm did for each iteration
      * 
-     * @throws NumberFormatException if an invalid string is in the {@code actions} parameter
-     * @throws IndexOutOfBoundsException if an invalid string is in the {@code actions} parameter
+     * @throws NumberFormatException an invalid String is in {@code actions}
+     * @throws IndexOutOfBoundsException an invalid String is in {@code actions}
      */
     private void visualizeAlgorithm(List<String> actions) {
         Thread t = new Thread() { // Run this on a different thread
@@ -387,6 +387,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * This function does nothing if {@code row} or {@code col} are outside the bounds of the grid.
      * If the incoming {@code sourceCoord} value is equal to {@link #destCoord}, {@code sourceCoord}
      * and {@code destCoord} will be swapped instead.  
+     * 
      * @param row row of new source tile location
      * @param col column of new source tile location
      */

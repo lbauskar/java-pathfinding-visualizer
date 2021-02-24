@@ -22,11 +22,11 @@ public class Node implements Comparable<Node>, Serializable {
 
 
     /**
-     * Creates Node that may or may not be reachable.
+     * Creates a Node that may or may not be reachable.
      * 
      * @param row row of 2D array this is in
      * @param col column of 2D array this is in 
-     * @param reachable whether an edge should be able to have this as a destination
+     * @param reachable boolean for if an Edge can contain this Node
      */
     public Node(int row, int col, boolean reachable) {
         this.row = row;
@@ -35,7 +35,7 @@ public class Node implements Comparable<Node>, Serializable {
     }
 
     /**
-     * Creates Node that is reachable.
+     * Creates a Node that is reachable.
      * 
      * @param row row of 2D array this is in
      * @param col column of 2D array this is in

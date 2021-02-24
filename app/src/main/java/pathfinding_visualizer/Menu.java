@@ -19,9 +19,9 @@ public class Menu extends JPanel {
     private Producer producer;
 
     /**
-     * Creates a {@link Menu} that sends messages using the {@code producer}. The {@link TileGrid}
+     * Creates a Menu that sends messages using the {@code producer}. The {@link TileGrid}
      * you want to modify should be part of a {@link Consumer} that contains the same {@code producer}.
-     * @param producer {@link Producer} object this Menu will send messages with
+     * @param producer Producer object this Menu will send messages with
      */
     public Menu(Producer producer) {
         this.producer = producer;
@@ -47,7 +47,7 @@ public class Menu extends JPanel {
      * The text fields accept integers between 4 and 99. When the button is clicked,
      * the connected TileGrid will change its width and height to match the text fields.
      * 
-     * @return a JPanel that modifies the size of the connected TileGrid.
+     * @return JPanel that modifies the size of the connected TileGrid.
      */
     private JPanel gridSizeForm() {
         JPanel form = new JPanel();
@@ -83,7 +83,7 @@ public class Menu extends JPanel {
      * Creates a JPanel that let's you pick paint colors via radio buttons.
      * The paint colors let you modify the TileGrid by adding and removing walls.
      * 
-     * @return a JPanel that let's you pick which paint color to use
+     * @return JPanel that let's you pick which paint color to use
      */
     private JPanel paintSelector() {
         final JRadioButton clear = new JRadioButton("erase");
@@ -126,7 +126,7 @@ public class Menu extends JPanel {
      * and 98. When the button is clicked the location of the TileGrid's source tile changes to match 
      * the numbers in the text fields.
      * 
-     * @return a JPanel that let's you change the location of a source tile.
+     * @return JPanel that let's you change the location of a source tile.
      */
     private JPanel sourcePanel() {
         JLabel l1 = new JLabel("Source: (");
@@ -162,7 +162,7 @@ public class Menu extends JPanel {
     /**
      * @see #sourcePanel
      * 
-     * @return a JPanel that let's you change the location of a destination tile
+     * @return JPanel that let's you change the location of a destination tile
      */
     private JPanel destPanel() {
         JLabel l1 = new JLabel("Destination: (");
@@ -199,11 +199,11 @@ public class Menu extends JPanel {
      * Makes a text field that accepts integers between {@code min} and {@code max} (inclusive),
      * with {@code cols} number of columns, and a default value of {@code def}.
      * 
-     * @param min the minimum accepted value of this text field
-     * @param max the maximum accepted value of this text field
-     * @param cols the number of columns this text field has 
+     * @param min minimum accepted value of this text field
+     * @param max maximum accepted value of this text field
+     * @param cols number of columns this text field has 
      * @param def this text field's default value
-     * @return a JTextField that only accepts integers between {@code min} and {@code max}.
+     * @return JTextField that only accepts integers between {@code min} and {@code max}.
      */
     private JTextField makeIntTextField(int min, int max, int cols, int def) {
         JTextField textField = new JTextField(cols);
@@ -215,70 +215,10 @@ public class Menu extends JPanel {
     }
 
     /**
-     * A DocumentFilter that accepts integers between {@code min} and {@code max}, inclusive.
-     */
-    private class IntFilter extends DocumentFilter {
-        private int min;
-        private int max;
-
-        IntFilter(int min, int max) {
-            this.min = min;
-            this.max = max;
-        }
-
-        @Override
-        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
-                throws BadLocationException {
-            Document doc = fb.getDocument();
-            StringBuilder sb = new StringBuilder(doc.getText(0, doc.getLength()));
-            sb.insert(offset, string);
-
-            if (valid(sb.toString())) {
-                super.insertString(fb, offset, string, attr);
-            }
-        }
-
-        @Override
-        public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
-                throws BadLocationException {
-            Document doc = fb.getDocument();
-            StringBuilder sb = new StringBuilder(doc.getText(0, doc.getLength()));
-            sb.replace(offset, offset + length, text);
-
-            if (valid(sb.toString())) {
-                super.replace(fb, offset, length, text, attrs);
-            }
-        }
-
-        @Override
-        public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
-            Document doc = fb.getDocument();
-            StringBuilder sb = new StringBuilder(doc.getText(0, doc.getLength()));
-            sb.delete(offset, offset + length);
-
-            if (valid(sb.toString())) {
-                super.remove(fb, offset, length);
-            }
-        }
-
-        private boolean valid(String s) {
-            if (s.isEmpty()) {
-                return true;
-            }
-            try {
-                int x = Integer.parseInt(s);
-                return x >= min && x <= max;
-            } catch (NumberFormatException e) {
-                return false;
-            }
-        }
-    }
-
-    /**
      * Creates a JPanel with a single check box. The checkbox allows diagonal movement in the TileGrid
      * when checked, and disallows it when unchecked.
      * 
-     * @return a JPanel that let's you choose whether the TileGrid should allow diagonal traversal
+     * @return JPanel that let's you choose whether the TileGrid should allow diagonal traversal
      */
     private JPanel diagonalCheckbox() {
         JPanel panel = new JPanel();
@@ -306,7 +246,7 @@ public class Menu extends JPanel {
      * select with pathfinding algorithm to visualize, and the button tells the TileGrid
      * to start visualizing that algorithm.
      * 
-     * @return a JPanel that lets you select and visualize a pathfinding algorithm
+     * @return JPanel that lets you select and visualize a pathfinding algorithm
      */
     private JPanel algorithmSelector() {
         String[] algorithms = {"BFS", "Djikstra"};
@@ -334,7 +274,7 @@ public class Menu extends JPanel {
      * Creates a JPanel with a single button. The button set every tile in the TileGrid that
      * was colored by a pathfinding algorithm back to its original color.
      * 
-     * @return a JPanel that gets rid of coloring done by a pathfinding algorithm
+     * @return JPanel that gets rid of coloring done by a pathfinding algorithm
      */
     private JPanel clearButton() {
         JButton button = new JButton("Clear Grid");

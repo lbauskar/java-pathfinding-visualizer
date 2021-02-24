@@ -31,7 +31,7 @@ public class TileGraph implements Serializable {
      * 
      * @param width Nodes wide the graph will be
      * @param height Nodes tall the graph will be
-     * @param connectDiagonals whether diagonal edges should be made
+     * @param connectDiagonals boolean for if diagonal edges should be made
      */
     public TileGraph(int width, int height, boolean connectDiagonals) {
         this.width = width;
@@ -73,7 +73,7 @@ public class TileGraph implements Serializable {
      * Replaces all edges in the graph with programatically generated new ones. The {@code connectDiagonals}
      * parameter determines if tiles that touch diagonally should be counted as neighbors and have edges between them.
      * 
-     * @param connectDiagonals whether diagonal edges should be made
+     * @param connectDiagonals boolean for if diagonal edges should be made
      */
     public void makeEdges(boolean connectDiagonals) {
         if (connectDiagonals == this.connectDiagonals) {
@@ -88,9 +88,9 @@ public class TileGraph implements Serializable {
      * Finds and returns the Node that corresponds to the tile located on Row {@code row}
      * and Column {@code col}. 
      * 
-     * @param row the row the Node is located on
-     * @param col the column the Node is located on
-     * @return the Node located at {@code [row][col]}
+     * @param row row the Node is located on
+     * @param col column the Node is located on
+     * @return Node located at {@code [row][col]}
      */
     public Node getNode(int row, int col) {
         return graph.get(row).get(col).first;
@@ -109,8 +109,8 @@ public class TileGraph implements Serializable {
     /**
      * Sets {@code n}'s outgoing edges to {@code neighbors}.
      * 
-     * @param n the Node who's outgoing Edges you want to replace
-     * @param neighbors the Edges you're replacing with
+     * @param n Node who's outgoing Edges you want to replace
+     * @param neighbors ArrayList of Edges you're replacing with
      */
     private void setNeighbors(Node n, ArrayList<Edge> neighbors) {
         graph.get(n.row).get(n.col).second = neighbors;
@@ -122,8 +122,8 @@ public class TileGraph implements Serializable {
      * a corresponding edge is added to a list. This list is returned once all adjacent
      * Nodes are checked. 
      * 
-     * @param source the Node you want to find neighbors of
-     * @return a List of outgoing Edges for {@code source}
+     * @param source Node you want to find neighbors of
+     * @return ArrayList of outgoing Edges for {@code source}
      */
     private ArrayList<Edge> makeNeighbors(Node source) {
         ArrayList<Edge> edgeList = new ArrayList<>();
@@ -194,7 +194,7 @@ public class TileGraph implements Serializable {
      * <p>
      * "(0, 0): [((0, 0), (0, 1), 1.000000), ((0, 0), (1, 0), 1.000000), ... ]" 
      * 
-     * @return A string representation of the entire 2D graph array
+     * @return String representation of the entire 2D graph array
      */
     @Override
     public String toString() {
@@ -221,7 +221,7 @@ public class TileGraph implements Serializable {
      * 
      * @param row Row the Node is on
      * @param col Column the Node is on
-     * @param reachable Whether a Node can connect to other Nodes or vice-versa
+     * @param reachable boolean for if a Node can connect to other Nodes or vice-versa
      */
     public void setNodeReachability(int row, int col, boolean reachable) {
         Node n = getNode(row, col);
@@ -263,7 +263,7 @@ public class TileGraph implements Serializable {
      * that are touching diagonally. If {@code connectDiagonals} is false, only tiles
      * that are cardinally adjacent to each other can have Edges.
      * 
-     * @return the value of the {@code connectDiagonals} field
+     * @return boolean value of the {@code connectDiagonals} field
      */
     public boolean diagonalsConnected() {
         return connectDiagonals;

@@ -3,24 +3,24 @@ package pathfinding_visualizer;
 import java.io.Serializable;
 
 /**
- * A simple structure that contains two Serializable objects. Both objects are publicly accessible.
+ * A simple structure that contains two serializable objects. Both objects are publicly accessible.
  */
 public class Pair<T extends Serializable, U extends Serializable> implements Serializable {
     private static final long serialVersionUID = -8529217112653744086L;
     /**
-     * A Serializable object.
+     * A serializable object.
      */
     public T first;
     /**
-     * A Serializable object.
+     * A serializable object.
      */
     public U second;
 
     /**
      * Creates a {@link Pair} containing {@code first} and {@code second}.
      * 
-     * @param first a Serializable object
-     * @param second a Serializable object
+     * @param first serializable object
+     * @param second serializable object
      */
     public Pair(T first, U second) {
         this.first = first;
@@ -59,7 +59,7 @@ public class Pair<T extends Serializable, U extends Serializable> implements Ser
      * Creates the string representations of the {@code first} and {@code second} fields enclosed 
      * in parenthesis and separated by a comma - like "(x, y)".
      * 
-     * @return a String in the form {@code (first, second)}
+     * @return String in the form {@code (first, second)}
      */
     @Override
     public String toString() {

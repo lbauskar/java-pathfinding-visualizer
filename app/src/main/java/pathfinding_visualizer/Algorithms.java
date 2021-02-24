@@ -10,9 +10,9 @@ public class Algorithms {
      * Creates a String with the format "path x1 y1 x2 y2 ...". Every x and y value
      * corresponds to the coordinates of a node that is part of the shortest path.
      * 
-     * @param prev a Map where prev[n] is the Node that preceded n on the shortest path
-     * @param end the Node the shortest path ended at 
-     * @return a String representation of the shortest path
+     * @param prev Map where prev[n] is the Node that preceded n on the shortest path
+     * @param end Node the shortest path ended at 
+     * @return String representation of the shortest path
      */
     private static String reconstructPath(Map<Node, Node> prev, Node end) {
         StringBuilder sb = new StringBuilder("path");
@@ -42,10 +42,10 @@ public class Algorithms {
      * <p>
      * BFS only works on unweighted graphs. It will probably get the wrong answer if a graph with varying edge weights is fed into it.
      * 
-     * @param sourceCoord the location of the source tile
-     * @param destCoord the location of the destination tile
-     * @param graph the TileGraph this algorithm will run on
-     * @return a List of Strings that show what the pathfinding algorithm did at each step
+     * @param sourceCoord Pair of Integers that equal the location of the source tile
+     * @param destCoord Pair of Integers that equal the location of the destination tile
+     * @param graph TileGraph this algorithm will run on
+     * @return List of Strings that show what the pathfinding algorithm did at each step
      */
     public static List<String> bfs(Pair<Integer, Integer> sourceCoord, Pair<Integer, Integer> destCoord, TileGraph graph) {
         List<String> actions = new LinkedList<>();
@@ -90,10 +90,10 @@ public class Algorithms {
      * with the minimum distance being at the top of the queue. Whenever a Node is visited, it is added to the 
      * priority queue. Once the destination node is reached the algorithm terminates.
      * 
-     * @param sourceCoord the location of the source tile
-     * @param destCoord the location of the destination tile
-     * @param graph the TileGraph this algorithm will run on
-     * @return a List of Strings that show what the pathfinding algorithm did at each step
+     * @param sourceCoord Pair of Integers that equal the location of the source tile
+     * @param destCoord Pair of Integers that equal the location of the destination tile
+     * @param graph TileGraph this algorithm will run on
+     * @return List of Strings that show what the pathfinding algorithm did at each step
      */
     public static List<String> djikstra(Pair<Integer, Integer> sourceCoord, Pair<Integer, Integer> destCoord, TileGraph graph) {
         List<String> actions = new LinkedList<>();
