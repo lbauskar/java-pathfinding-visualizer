@@ -309,7 +309,7 @@ public class Menu extends JPanel {
      * @return a JPanel that lets you select and visualize a pathfinding algorithm
      */
     private JPanel algorithmSelector() {
-        String[] algorithms = {"BFS"};
+        String[] algorithms = {"BFS", "Djikstra"};
         JComboBox<String> box = new JComboBox<>(algorithms);
         JButton button = new JButton("Start");
         button.addActionListener(

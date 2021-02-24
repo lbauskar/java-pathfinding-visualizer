@@ -29,6 +29,10 @@ public class TileGraph implements Serializable {
         makeEdges();
     }
 
+    public int numNodes() {
+        return width * height;
+    }
+
     private void makeEdges() {
         for (int row = 0; row < height; ++row) {
             for (int col = 0; col < width; ++col) {
@@ -45,11 +49,11 @@ public class TileGraph implements Serializable {
         makeEdges();
     }
 
-    private Node findNode(int row, int col) {
+    public Node findNode(int row, int col) {
         return graph.get(row).get(col).first;
     }
 
-    private List<Edge> findNeighbors(Node n) {
+    public List<Edge> findNeighbors(Node n) {
         return graph.get(n.row).get(n.col).second;
     }
 
@@ -165,54 +169,4 @@ public class TileGraph implements Serializable {
         return connectDiagonals;
     }
 
-    private String reconstructPath(Map<Node, Node> prev, Node end) {
-        StringBuilder sb = new StringBuilder("path");
-        Node curr = end;
-        while (curr != null) {
-            sb.append(' ');
-            sb.append(curr.row);
-            sb.append(' ');
-            sb.append(curr.col);
-            curr = prev.get(curr);
-        }
-
-        return sb.toString();
-    }
-
-    public List<String> bfs(Pair<Integer, Integer> source, Pair<Integer, Integer> dest) {
-        List<String> actions = new LinkedList<>();
-        Node start = findNode(source.first, source.second);
-        Node end = findNode(dest.first, dest.second);
-
-        Queue<Node> q = new LinkedList<>();
-        Set<Node> visited = new HashSet<>();
-        Map<Node, Node> previous = new HashMap<>();
-
-        q.add(start);
-        visited.add(start);
-        previous.put(start, null);
-
-        while (!q.isEmpty()) {
-            Node curr = q.remove();
-            if (curr.equals(end)) {
-                actions.add(reconstructPath(previous, end));
-                break;
-            } else if (!curr.equals(start)) {
-                actions.add(String.format("visit %d %d", curr.row, curr.col));
-            }
-
-            for (Edge e : findNeighbors(curr)) {
-                Node next = e.dest;
-                if (visited.contains(next)) {
-                    continue;
-                }
-
-                previous.put(next, curr);
-                q.add(next);
-                visited.add(next);
-            }
-        }
-
-        return actions;
-    }
 }

@@ -15,7 +15,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
 
     /**
      * A 2D array of JPanels that keeps track of the tiles in the grid. 
-     * This array should have {@linkplain #tileY} rows and {@linkplain #tileX} columns.
+     * This array should have {@link #tileY} rows and {@link #tileX} columns.
      */
     private ArrayList<ArrayList<JPanel>> tiles;
 
@@ -44,7 +44,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
      */
     private Pair<Integer, Integer> destCoord = new Pair<>(19, 19);
     /**
-     * Whether the {@linkplain #graph} field should connect nodes that are touching diagonally. 
+     * Whether the {@link #graph} field should connect nodes that are touching diagonally. 
      */
     private boolean connectDiagonals = false;
 
@@ -100,7 +100,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * <ul>
      * <li> This function will do nothing if either {@code width} or {@code height} is less than 4
      * or greater than 99.
-     * <li> If the {@linkplain #sourceCoord} or {@linkplain #destCoord} fields of this TileGrid fall outside the grid after resizing, 
+     * <li> If the {@link #sourceCoord} or {@link #destCoord} fields of this TileGrid fall outside the grid after resizing, 
      * their values will be changed to put them back in the grid.
      * </ul> 
      * <p>
@@ -169,13 +169,13 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * <p>
      * Valid commands are:
      * <ul>
-     * <li> "resize width height" - calls {@linkplain #resizeGrid}
-     * <li> "paint color" - changes the {@linkplain #paintColor} field to the corresponding color from the {@link Pallete}
-     * <li> "source row col" - calls {@linkplain #changeSource}
-     * <li> "destination row col" - calls {@linkplain #changeDest}
-     * <li> "diagonal boolean" - sets the value of {@linkplain #connectDiagonals} and calls {@code graph.makeEdges()} 
-     * <li> "search algorithm" - calls {@linkplain #visualizeAlgorithm}
-     * <li> "clear" - calls {@linkplain #clearGrid}
+     * <li> "resize width height" - calls {@link #resizeGrid}
+     * <li> "paint color" - changes the {@link #paintColor} field to the corresponding color from the {@link Pallete}
+     * <li> "source row col" - calls {@link #changeSource}
+     * <li> "destination row col" - calls {@link #changeDest}
+     * <li> "diagonal boolean" - sets the value of {@link #connectDiagonals} and calls {@code graph.makeEdges()} 
+     * <li> "search algorithm" - calls {@link #chooseAlgorithm}
+     * <li> "clear" - calls {@link #clearGrid}
      * </ul>
      * 
      * @param message a String sent to the parent Consumer
@@ -218,10 +218,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
             break;
 
             case "search":
-                String algorithm = args[1];
-                if (algorithm.equals("BFS")) {
-                    visualizeAlgorithm(graph.bfs(sourceCoord, destCoord));
-                }
+                chooseAlgorithm(args[1]);
                 break;
 
             case "clear":
@@ -231,6 +228,25 @@ public class TileGrid extends JPanel implements MouseInputListener {
 
             default:
                 //System.out.println("Unknown message " + message);
+                break;
+        }
+    }
+
+    /**
+     * Visualizes a corresponding algorithm based on the string you enter. For
+     * example, "Djikstra" will visualize Djikstra's Algorithm.
+     * 
+     * @param algorithm String representation of algorithm you want visualized
+     */
+    private void chooseAlgorithm(String algorithm) {
+        switch (algorithm) {
+            case "BFS":
+                visualizeAlgorithm(Algorithms.bfs(sourceCoord, destCoord, graph));
+                break;
+            case "Djikstra":
+                visualizeAlgorithm(Algorithms.djikstra(sourceCoord, destCoord, graph));
+                break;
+            default:
                 break;
         }
     }
@@ -339,7 +355,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
 
     /**
      * Attempts to paint the tile located at the coordinate {@code (row, col)}. 
-     * Will not paint over tiles located at {@linkplain #sourceCoord} or {@linkplain #destCoord}.
+     * Will not paint over tiles located at {@link #sourceCoord} or {@link #destCoord}.
      * This function will also not paint tiles that are outside the bounds of the grid.
      * <p>
      * Also modified properties of underlying graph depending on what color is painted. 
@@ -364,12 +380,12 @@ public class TileGrid extends JPanel implements MouseInputListener {
     }
 
     /**
-     * Changes the value of {@linkplain #sourceCoord} and the visual location of the source tile.
+     * Changes the value of {@link #sourceCoord} and the visual location of the source tile.
      * The source tile is where the pathfinding algorithm will start. The previous source tile will be 
      * colored as clear and visitable.
      * <p>
      * This function does nothing if {@code row} or {@code col} are outside the bounds of the grid.
-     * If the incoming {@code sourceCoord} value is equal to {@linkplain #destCoord}, {@code sourceCoord}
+     * If the incoming {@code sourceCoord} value is equal to {@link #destCoord}, {@code sourceCoord}
      * and {@code destCoord} will be swapped instead.  
      * @param row row of new source tile location
      * @param col column of new source tile location
