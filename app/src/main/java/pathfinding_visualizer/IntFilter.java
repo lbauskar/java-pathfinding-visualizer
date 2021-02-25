@@ -3,7 +3,7 @@ package pathfinding_visualizer;
 import javax.swing.text.*;
 
 /**
- * A DocumentFilter that accepts integers between {@code min} and {@code max}, inclusive.
+ * DocumentFilter that accepts integers between {@code min} and {@code max}, inclusive.
  */
 public class IntFilter extends DocumentFilter {
     /**

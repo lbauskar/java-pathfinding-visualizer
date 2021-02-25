@@ -4,11 +4,12 @@ import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A rectangular, gridded tilemap used for pathfinding visualization.
+ * Rectangular, gridded tilemap used for pathfinding visualization.
  */
 public class TileGrid extends JPanel implements MouseInputListener {
     private static final long serialVersionUID = 2988009908866290833L; // auto-generated
@@ -82,7 +83,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * @param width  number of tiles this grid should have along the x-axis
      * @param height number of tiles this grid should have along the y-axis
      */
-    public TileGrid(int width, int height) {
+    public TileGrid(int width, int height, Producer producer) {
         this.addMouseMotionListener(this);
 
         if (width < 4 || width > 99 || height < 4 || height > 99) {
@@ -93,6 +94,22 @@ public class TileGrid extends JPanel implements MouseInputListener {
         resizeGrid(width, height);
         changeSource(0, 0);
         changeDest(tileX - 1, tileY - 1);
+
+        Consumer consumer = new Consumer(producer) {
+			@Override
+			public void run() {
+                while (true) {
+                    try {
+                        String message = this.getMessage();
+                        SwingUtilities.invokeAndWait(() -> parseMessages(message));
+                    } catch (InvocationTargetException | InterruptedException e) {
+                        e.printStackTrace();
+                        Thread.currentThread().interrupt();
+                    }
+                }
+			}
+        };
+        consumer.start();
     }
 
     /**
@@ -130,12 +147,16 @@ public class TileGrid extends JPanel implements MouseInputListener {
         int y = sourceCoord.second;
         if (x < 0 || x >= tileX || y < 0 || y >= tileY) {
             changeSource(0, 0);
+        } else {
+            changeSource(x, y);
         }
 
         x = destCoord.first;
         y = destCoord.second;
         if (x < 0 || x >= tileX || y < 0 || y >= tileY) {
             changeDest(tileX - 1, tileY - 1);
+        } else {
+            changeDest(x, y);
         }
 
         if (sourceCoord.equals(destCoord) && sourceCoord.equals(new Pair<>(0, 0))) {
@@ -177,22 +198,21 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * <p>
      * Valid commands are:
      * <ul>
-     * <li>"resize width height" - calls {@link #resizeGrid}
-     * <li>"paint color" - changes the {@link #paintColor} field to the
-     * corresponding color from the {@link Pallete}
-     * <li>"source row col" - calls {@link #changeSource}
-     * <li>"destination row col" - calls {@link #changeDest}
-     * <li>"diagonal boolean" - sets the value of {@link #connectDiagonals} and
-     * calls {@code graph.makeEdges()}
-     * <li>"search algorithm" - calls {@link #chooseAlgorithm}
-     * <li>"clear" - calls {@link #clearGrid}
+     * <li>"resize width height" - resizes the grid
+     * <li>"paint color" - changes the color you paint with
+     * <li>"source row col" - changes the location of the source tile
+     * <li>"destination row col" - changes the location of the destination tile
+     * <li>"diagonal boolean" - sets whether tiles can be traversed diagonally
+     * <li>"search algorithm" - visualizes a pathfinding algorithm
+     * <li>"clear" - sets every tile colored by an algorithm back to its original color
+     * <li>"erase" - resets every tile except the source and destination tile back to its original color
      * </ul>
      * 
      * @param message String sent to the parent Consumer
      * @throws NumberFormatException     {@code message} is not a valid command
      * @throws IndexOutOfBoundsException {@code message} is not a valid command
      */
-    public void consume(String message) {
+    public void parseMessages(String message) {
         String[] args = message.split(" ");
         String command = args[0];
         switch (command) {
@@ -234,6 +254,10 @@ public class TileGrid extends JPanel implements MouseInputListener {
 
             case "clear":
                 clearGrid();
+                break;
+
+            case "erase":
+                resizeGrid(tileX, tileY);
                 break;
 
             default:
@@ -389,7 +413,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
         if (coord.equals(sourceCoord) || coord.equals(destCoord)) {
             return;
         }
-        if (row < 0 || row >= tileY || col < 0 && col >= tileX) {
+        if (row < 0 || row >= tileY || col < 0 || col >= tileX) {
             return;
         }
 

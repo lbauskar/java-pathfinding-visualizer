@@ -10,19 +10,18 @@ import java.util.Queue;
 public class Producer implements Serializable {
     private static final long serialVersionUID = -5768889538764837228L;
     /**
-     * The limit to how large {@link #messageQueue} can be. Attempts to add
-     * messages to the queue when it reaches this size will stall
-     * until the queue has shrunk.
+     * Limit to how large {@code messageQueue} can be. Attempts to add
+     * messages to the messageQueue when it reaches this size will stall
+     * until messageQueue has shrunk.
      */
     static final int MAX_QUEUE_SIZE = 10;
     /**
-     * The message queue of Strings. 
+     * Queue of Strings to be sent to a Consumer. 
      */
     private Queue<String> messageQueue = new LinkedList<>();
 
     /**
-     * Retrieves a message from the message queue. This be used by a {@link Consumer}
-     * object rather than the Producer directly.
+     * Retrieves a message from {@code messageQueue}.
      * @return the first String message in the message queue
      * @throws InterruptedException if the function waits too long
      */
@@ -36,11 +35,11 @@ public class Producer implements Serializable {
     }
 
     /**
-     * Puts a String in a message queue for another thread to retrieve and read later. 
-     * If the message queue already contains {@value #MAX_QUEUE_SIZE} messages, this
-     * function will wait for the message queue to get smaller before adding the new message.
+     * Puts a String in {@code messageQueue}. 
+     * If {@code messageQueue} already contains {@value #MAX_QUEUE_SIZE} Strings, this
+     * function will wait for {@code messageQueue} to get smaller before adding {@code message}.
      * 
-     * @param message String to send to another thread
+     * @param message String to add to {@code messageQueue}
      * @throws InterruptedException the function waited too long and got interrupted
      */
     public synchronized void sendMessage(String message) throws InterruptedException {

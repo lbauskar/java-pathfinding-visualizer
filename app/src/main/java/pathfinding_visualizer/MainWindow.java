@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * The window this app runs in. 
+ * JFrame window this app runs in. 
  */
 public class MainWindow extends JFrame {
     private static final long serialVersionUID = 8073827579515641067L; // auto-generated
@@ -27,10 +27,8 @@ public class MainWindow extends JFrame {
 
         // create subpanels
         Producer producer = new Producer();
-        TileGrid grid = new TileGrid(20, 20);
-        Consumer consumer = new Consumer(producer, grid);
-        consumer.start();
         JPanel menu = new Menu(producer);
+        TileGrid grid = new TileGrid(20, 20, producer);
 
         // Create layout with 2 panels side by side
         pane.setLayout(new GridBagLayout());

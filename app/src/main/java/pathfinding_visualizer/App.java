@@ -3,7 +3,7 @@ package pathfinding_visualizer;
 import javax.swing.*;
 
 /**
- * Simple class that runs this program
+ * Simple class that starts this program
  */
 public class App {
 

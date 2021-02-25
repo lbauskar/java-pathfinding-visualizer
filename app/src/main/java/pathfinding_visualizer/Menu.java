@@ -5,14 +5,14 @@ import javax.swing.text.*;
 import java.awt.*;
 
 /**
- * A JPanel with UI elements that can modify a {@link TileGrid}.
+ * JPanel with UI elements that modifies a {@link TileGrid}.
  */
 public class Menu extends JPanel {
     private static final long serialVersionUID = -2183382640701870707L;
     /**
      * Default background color of all JPanels in this Menu
      */
-    private static final Color bg = Color.blue;
+    private static final Color bg = Color.gray;
     /**
      * Producer this Menu sends messages to
      */
@@ -20,8 +20,7 @@ public class Menu extends JPanel {
 
     /**
      * Creates a Menu that sends messages using the {@code producer}. The {@link TileGrid}
-     * you want to modify should be part of a {@link Consumer} that contains the same {@code producer}.
-     * @param producer Producer object this Menu will send messages with
+     * you want to modify use the same {@code producer} in its constructor.
      */
     public Menu(Producer producer) {
         this.producer = producer;
@@ -40,6 +39,11 @@ public class Menu extends JPanel {
         this.add(diagonalCheckbox());
         this.add(algorithmSelector());
         this.add(clearButton());
+        this.add(eraseButton());
+
+        for (Component component : this.getComponents()) {
+            component.setBackground(bg);
+        }
     }
 
     /**
@@ -51,7 +55,6 @@ public class Menu extends JPanel {
      */
     private JPanel gridSizeForm() {
         JPanel form = new JPanel();
-        form.setBackground(bg);
 
         JLabel xLabel = new JLabel("Tiles Wide: ");
         JLabel yLabel = new JLabel("Tiles Tall: ");
@@ -114,7 +117,6 @@ public class Menu extends JPanel {
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(bg);
         panel.add(clear);
         panel.add(wall);
 
@@ -148,7 +150,6 @@ public class Menu extends JPanel {
         });
 
         JPanel panel = new JPanel();
-        panel.setBackground(bg);
         panel.add(l1);
         panel.add(xField);
         panel.add(l2);
@@ -184,7 +185,6 @@ public class Menu extends JPanel {
         });
 
         JPanel panel = new JPanel();
-        panel.setBackground(bg);
         panel.add(l1);
         panel.add(xField);
         panel.add(l2);
@@ -196,7 +196,7 @@ public class Menu extends JPanel {
     }
 
     /**
-     * Makes a text field that accepts integers between {@code min} and {@code max} (inclusive),
+     * Makes JTextField that accepts integers between {@code min} and {@code max} (inclusive),
      * with {@code cols} number of columns, and a default value of {@code def}.
      * 
      * @param min minimum accepted value of this text field
@@ -215,7 +215,7 @@ public class Menu extends JPanel {
     }
 
     /**
-     * Creates a JPanel with a single check box. The checkbox allows diagonal movement in the TileGrid
+     * Creates JPanel with a single check box. The checkbox allows diagonal movement in the TileGrid
      * when checked, and disallows it when unchecked.
      * 
      * @return JPanel that let's you choose whether the TileGrid should allow diagonal traversal
@@ -242,7 +242,7 @@ public class Menu extends JPanel {
     }
 
     /**
-     * Creates a JPanel with a drop down menu, and a button. The drop down menu lets you
+     * Creates JPanel with a drop down menu, and a button. The drop down menu lets you
      * select with pathfinding algorithm to visualize, and the button tells the TileGrid
      * to start visualizing that algorithm.
      * 
@@ -271,16 +271,41 @@ public class Menu extends JPanel {
     }
 
     /**
-     * Creates a JPanel with a single button. The button set every tile in the TileGrid that
+     * Creates JPanel with a single button. The button set every tile in the TileGrid that
      * was colored by a pathfinding algorithm back to its original color.
      * 
      * @return JPanel that gets rid of coloring done by a pathfinding algorithm
      */
     private JPanel clearButton() {
-        JButton button = new JButton("Clear Grid");
+        JButton button = new JButton("Clear Pathfinder");
         button.addActionListener(
             event -> {
                 String message = "clear";
+                try {
+                    producer.sendMessage(message);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                }
+            }
+        );
+
+        JPanel panel = new JPanel();
+        panel.add(button);
+        return panel;
+    }
+
+    /**
+     * Craetes JPanel with a single button. This buttons sets every wall, visited, and path tile
+     * back to it's original color.
+     * 
+     * @return JPanel that gets rid of walls and coloring done by a pathfinding algorithm.
+     */
+    private JPanel eraseButton() {
+        JButton button = new JButton("Erase Walls");
+        button.addActionListener(
+            event -> {
+                String message = "erase";
                 try {
                     producer.sendMessage(message);
                 } catch (InterruptedException e) {

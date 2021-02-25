@@ -36,8 +36,9 @@ public class Algorithms {
     }
 
     /**
-     * Breadth-First Search (BFS) algorithm. Finds the shortest path between two Nodes by using a queue. Whenever 
-     * a Node is visited it is added to the queue. Whenever a Node is visited, it is added to the queue. This means
+     * Breadth-First Search (BFS) algorithm. Finds the shortest path between two Nodes by using a queue.
+     * <p>
+     * Whenever a Node is visited it is added to the queue. Whenever a Node is visited, it is added to the queue. This means
      * Nodes that are visited earlier are processed earlier. Once the destination node is reached the algorithm terminates.
      * <p>
      * BFS only works on unweighted graphs. It will probably get the wrong answer if a graph with varying edge weights is fed into it.
@@ -86,6 +87,7 @@ public class Algorithms {
 
     /**
      * Djikstra's Algorithm. Finds the shortest path between two nodes on a graph by using priority queue.
+     * <p>
      * The priority queue contains Nodes sorted on the basis of the total distance it took to reach that Node,
      * with the minimum distance being at the top of the queue. Whenever a Node is visited, it is added to the 
      * priority queue. Once the destination node is reached the algorithm terminates.
@@ -136,6 +138,20 @@ public class Algorithms {
         return actions;
     }
 
+    /**
+     * A* Algorithm. Similar to Djikstra's Algorithm, but when two nodes have and equal distance value, a heuristic is used to pick
+     * the node "closer" to the destination. 
+     * <p>
+     * If diagonal traversal is allowed the euclidian distance between the current and destination node is used. If diagonal
+     * traversal is not allowed, manhattan distance is used instead.
+     * 
+     * @param sourceCoord Pair of Integers that equal the location of the source tile
+     * @param destCoord Pair of Integers that equal the location of the destination tile
+     * @param graph TileGraph this algorithm will run on
+     * @return List of Strings that show what the pathfinding algorithm did at each step
+     * 
+     * @see #djikstra
+     */
     public static List<String> aStar(Pair<Integer, Integer> sourceCoord, Pair<Integer, Integer> destCoord, TileGraph graph) {
         List<String> actions = new ArrayList<>();
         Node start = graph.getNode(sourceCoord.first, sourceCoord.second);
@@ -187,10 +203,25 @@ public class Algorithms {
         return actions;
     }
 
+    /**
+     * Creates an action String when you visit a node
+     * @param n Node visited
+     * @return "visit x y" where x and y are the coordinates of {@code n}
+     */
     private static String visit(Node n) {
         return String.format("visit %d %d", n.row, n.col);
     }
 
+    /**
+     * Estimates the distance between {@code a} and {@code b}. If {@code graph} allows
+     * diagonal traversal, this estimation is the euclidean distance between the two Nodes. 
+     * Otherwise, manhattan distance is used for estimation.
+     *  
+     * @param a Node in {@code graph}
+     * @param b Node in {@code graph}
+     * @param graph TileGraph containing both Nodes
+     * @return double value for estimated distance between {@code a} and {@code b}
+     */
     private static double heuristic(Node a, Node b, TileGraph graph) {
         if (graph.diagonalsConnected()) {
             //euclidean distance

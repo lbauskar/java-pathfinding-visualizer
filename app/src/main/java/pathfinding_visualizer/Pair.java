@@ -3,7 +3,7 @@ package pathfinding_visualizer;
 import java.io.Serializable;
 
 /**
- * A simple structure that contains two serializable objects. Both objects are publicly accessible.
+ * Simple structure that contains two serializable objects. Both objects are publicly accessible.
  */
 public class Pair<T extends Serializable, U extends Serializable> implements Serializable {
     private static final long serialVersionUID = -8529217112653744086L;
