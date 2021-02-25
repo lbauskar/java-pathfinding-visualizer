@@ -21,6 +21,8 @@ public class Menu extends JPanel {
     /**
      * Creates a Menu that sends messages using the {@code producer}. The {@link TileGrid}
      * you want to modify use the same {@code producer} in its constructor.
+     * 
+     * @param producer Producer you want this Menu to send messages with
      */
     public Menu(Producer producer) {
         this.producer = producer;

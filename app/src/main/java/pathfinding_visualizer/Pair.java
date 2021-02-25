@@ -47,12 +47,7 @@ public class Pair<T extends Serializable, U extends Serializable> implements Ser
         } else if (other.getClass() != this.getClass()) {
             return false;
         } else {
-            Pair<T, U> p;
-            try {
-                p = (Pair<T, U>) other;
-            } catch (ClassCastException e) {
-                return false;
-            }
+            Pair<T, U> p = (Pair<T, U>) other;
             boolean firstEquals = this.first.equals(p.first);
             boolean secondEquals = this.second.equals(p.second);
             return firstEquals && secondEquals;

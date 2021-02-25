@@ -13,6 +13,7 @@ public abstract class Consumer extends Thread {
      */
     protected Consumer(Producer producer) {
         this.producer = producer;
+        this.start();
     }
 
     /**

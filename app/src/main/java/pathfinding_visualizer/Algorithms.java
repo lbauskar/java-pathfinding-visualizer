@@ -246,7 +246,7 @@ public class Algorithms {
      * @param height height of {@code graph}
      * @return Set of Integer Pairs that correspond to the tiles that should be walls
      */
-    public static Set<Pair<Integer, Integer>> makeMaze(Pair<Integer, Integer> sourceCoord, Pair<Integer, Integer> destCoord, TileGraph graph, int width, int height) {
+    public static Set<Pair<Integer, Integer>> makeMaze(Pair<Integer, Integer> sourceCoord, Pair<Integer, Integer> destCoord, TileGraph graph, int width, int height, Random random) {
         Set<Pair<Integer, Integer>> walls = new HashSet<>();
 
         // Create grid of walls aligned to even rows and columns
@@ -276,7 +276,6 @@ public class Algorithms {
         
         Set<Node> visited = new HashSet<>();
         Deque<Node> stack = new LinkedList<>();  // use Deque because Stack is synchronized
-        Random rand = new Random(System.currentTimeMillis());
 
         stack.add(start);
         visited.add(start);
@@ -285,28 +284,29 @@ public class Algorithms {
             Node curr = stack.pop();
             List<Node> neighbors = unvisitedMazeNeighbors(curr, width, height, graph, visited);
             
-            if (!neighbors.isEmpty()) {
-                stack.add(curr);
-                int index = Math.abs(rand.nextInt()) % neighbors.size();
-                Node next = neighbors.get(index);
-
-                Pair<Integer, Integer> wallCoord;
-                if (next.row < curr.row) { // neighbor above
-                    wallCoord = new Pair<>(curr.row - 1, curr.col);
-                } else if (next.row > curr.row) { // below
-                    wallCoord = new Pair<>(curr.row + 1, curr.col);
-                } else if (next.col < curr.col) { // left 
-                    wallCoord = new Pair<>(curr.row, curr.col - 1);
-                } else { // right
-                    wallCoord = new Pair<>(curr.row, curr.col + 1);
-                }
-
-                graph.setNodeReachability(wallCoord.first, wallCoord.second, true);
-                walls.remove(wallCoord);
-
-                visited.add(next);
-                stack.add(next);
+            if (neighbors.isEmpty()) {
+                continue;
             }
+
+            stack.add(curr);
+            Node next = neighbors.get(random.nextInt(neighbors.size()));
+
+            Pair<Integer, Integer> wallCoord;
+            if (next.row < curr.row) { // neighbor above
+                wallCoord = new Pair<>(curr.row - 1, curr.col);
+            } else if (next.row > curr.row) { // below
+                wallCoord = new Pair<>(curr.row + 1, curr.col);
+            } else if (next.col < curr.col) { // left 
+                wallCoord = new Pair<>(curr.row, curr.col - 1);
+            } else { // right
+                wallCoord = new Pair<>(curr.row, curr.col + 1);
+            }
+
+            graph.setNodeReachability(wallCoord.first, wallCoord.second, true);
+            walls.remove(wallCoord);
+
+            visited.add(next);
+            stack.add(next);
         }
 
         return walls;

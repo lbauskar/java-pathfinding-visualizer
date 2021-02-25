@@ -218,9 +218,7 @@ public class TileGraph implements Serializable {
         for (int row = 0; row < graph.size(); ++row) {
             List<Pair<Node, ArrayList<Edge>>> list = graph.get(row);
             for (Pair<Node, ArrayList<Edge>> p : list) {
-                //String s1 = p.second.toString();
                 Collections.sort(p.second); //sort so that string output is consistent
-                //String s2 = p.second.toString();
                 sb.append(p.first.toString());
                 sb.append(':');
                 sb.append(p.second.toString());
@@ -246,7 +244,20 @@ public class TileGraph implements Serializable {
         boolean oldReach = n.reachable;
         n.reachable = reachable;
 
-        if (!reachable && reachable != oldReach) {
+        if (reachable == oldReach) { // do nothing if reachability isn't changed
+            return;
+        }
+
+        if (reachable) { // connect n to its neighbors
+            ArrayList<Edge> neighbors = makeNeighbors(n);
+            setNeighbors(n, neighbors);
+
+            for (Edge edge : neighbors) {
+                Node dest = edge.dest;
+                Edge destEdge = new Edge(dest, n, edge.weight);
+                getNeighbors(dest).add(destEdge);
+            }
+        } else { // disconnect n from its neighbors
             List<Edge> neighbors = getNeighbors(n);
             setNeighbors(n, new ArrayList<>());
 
@@ -255,21 +266,11 @@ public class TileGraph implements Serializable {
                 List<Edge> destNeighbors = getNeighbors(dest);
                 Edge toRemove = null;
                 for (Edge destEdge : destNeighbors) {
-                    if (destEdge.dest == n) {
+                    if (destEdge.dest.equals(n)) {
                         toRemove = destEdge;
-                        break;
                     }
                 }
                 destNeighbors.remove(toRemove);
-            }
-        } else if (reachable && reachable != oldReach) {
-            ArrayList<Edge> neighbors = makeNeighbors(n);
-            setNeighbors(n, neighbors);
-
-            for (Edge edge : neighbors) {
-                Node dest = edge.dest;
-                Edge destEdge = new Edge(dest, n, edge.weight);
-                getNeighbors(dest).add(destEdge);
             }
         }
     }

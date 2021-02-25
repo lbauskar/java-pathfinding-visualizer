@@ -7,6 +7,14 @@ import javax.swing.*;
  */
 public class App {
 
+
+    /**
+     * Private constructor so default one isn't made
+     */
+    private App() {
+        // Do nothing
+    }
+
     /**
      * Creates and packs a {@link MainWindow} that holds the program.
      * 

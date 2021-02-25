@@ -1,0 +1,1 @@
+[visit 0 1, visit 1 0, visit 1 1, visit 2 0, visit 0 2, visit 3 0, visit 1 2, visit 2 1, visit 2 2, visit 3 1, visit 4 0, visit 4 1, visit 5 0, visit 3 2, visit 6 0, visit 4 2, visit 5 1, visit 5 2, visit 6 1, visit 7 0, visit 7 1, visit 8 0, visit 6 2, visit 9 0, visit 7 2, visit 8 1, visit 8 2, visit 9 1, visit 9 2]

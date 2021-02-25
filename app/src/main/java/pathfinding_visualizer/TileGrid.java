@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -83,6 +84,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * 
      * @param width  number of tiles this grid should have along the x-axis
      * @param height number of tiles this grid should have along the y-axis
+     * @param producer Producer you want this TileGrid to listen to
      */
     public TileGrid(int width, int height, Producer producer) {
         this.addMouseMotionListener(this);
@@ -110,7 +112,6 @@ public class TileGrid extends JPanel implements MouseInputListener {
                 }
 			}
         };
-        consumer.start();
     }
 
     /**
@@ -277,7 +278,8 @@ public class TileGrid extends JPanel implements MouseInputListener {
      */
     private void makeMaze() {
         resizeGrid(tileX, tileY);
-        Set<Pair<Integer, Integer>> walls = Algorithms.makeMaze(sourceCoord, destCoord, graph, tileX, tileY);
+        Set<Pair<Integer, Integer>> walls = 
+            Algorithms.makeMaze(sourceCoord, destCoord, graph, tileX, tileY, new Random(System.currentTimeMillis()));
 
         for (Pair<Integer, Integer> p : walls) {
             paintTile(p.first, p.second, Pallete.WALL);

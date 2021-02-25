@@ -47,11 +47,11 @@ public class Node implements Comparable<Node>, Serializable {
     /**
      * {@inheritDoc}
      * 
-     * @return String representation of this Node - {@code "(row, col)"}
+     * @return String representation of this Node - {@code "(row, col, reachable)"}
      */
     @Override
     public String toString() {
-        return String.format("(%s, %s)", row, col);
+        return String.format("(%s, %s, %b)", row, col, reachable);
     }
 
     /**
@@ -65,7 +65,10 @@ public class Node implements Comparable<Node>, Serializable {
     public int compareTo(Node other) {
         int rowComp = ((Integer) this.row).compareTo(other.row);
         int colComp = ((Integer) this.col).compareTo(other.col);
-        if (rowComp == 0) {
+        int reachComp = ((Boolean) this.reachable).compareTo(other.reachable);
+        if (rowComp == 0 && colComp == 0) {
+            return reachComp;
+        } else if (rowComp == 0) {
             return colComp;
         } else {
             return rowComp;
@@ -102,7 +105,6 @@ public class Node implements Comparable<Node>, Serializable {
      */
     @Override
     public int hashCode() {
-        char reachChar = reachable ? 't' : 'f';
-        return (this.toString() + reachChar).hashCode();
+        return (this.toString()).hashCode();
     }
 }

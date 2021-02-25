@@ -14,7 +14,7 @@ public class Producer implements Serializable {
      * messages to the messageQueue when it reaches this size will stall
      * until messageQueue has shrunk.
      */
-    static final int MAX_QUEUE_SIZE = 10;
+    public static final int MAX_QUEUE_SIZE = 10;
     /**
      * Queue of Strings to be sent to a Consumer. 
      */
@@ -32,6 +32,10 @@ public class Producer implements Serializable {
         }
 
         return messageQueue.remove();
+    }
+
+    public synchronized int size() {
+        return messageQueue.size();
     }
 
     /**

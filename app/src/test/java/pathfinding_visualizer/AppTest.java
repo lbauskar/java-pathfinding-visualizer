@@ -4,12 +4,21 @@
 package pathfinding_visualizer;
 
 import org.junit.Test;
-
 import static org.junit.Assert.*;
 
+/**
+ * Tests the {@link App}.
+ */
 public class AppTest {
-    @Test public void fillerTest() {
-        App app = new App();
-        assertNotNull(app);
+    
+    /**
+     * Attempt to run the {@code main} function of {@code App}. Test passes
+     * if {@code main} throws no errors.
+     */
+    @Test
+    public void runProgram() {
+        // check that window is made with no errors
+        App.main(null);
+        assertTrue(true);
     }
 }
