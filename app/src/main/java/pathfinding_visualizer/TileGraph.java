@@ -135,10 +135,11 @@ public class TileGraph implements Serializable {
         boolean right = c < width - 1;
         boolean diag = connectDiagonals;
         Node dest;
+        final double SQRT2 = Math.sqrt(2);
 
         if (diag && top && left) {
             dest = getNode(r - 1, c -1);
-            tryAddingEdge(source, dest, edgeList);
+            tryAddingEdge(source, dest, SQRT2, edgeList);
         }
         if (top) {
             dest = getNode(r - 1, c);
@@ -146,7 +147,7 @@ public class TileGraph implements Serializable {
         }
         if (diag && top && right) {
             dest = getNode(r - 1, c + 1);
-            tryAddingEdge(source, dest, edgeList);
+            tryAddingEdge(source, dest, SQRT2, edgeList);
         }
 
         if (left) {
@@ -160,7 +161,7 @@ public class TileGraph implements Serializable {
 
         if (diag && bottom && left) {
             dest = getNode(r + 1, c - 1);
-            tryAddingEdge(source, dest, edgeList);
+            tryAddingEdge(source, dest, SQRT2, edgeList);
         }
         if (bottom) {
             dest = getNode(r + 1, c);
@@ -168,7 +169,7 @@ public class TileGraph implements Serializable {
         }
         if (diag && bottom && right) {
             dest = getNode(r + 1, c + 1);
-            tryAddingEdge(source, dest, edgeList);
+            tryAddingEdge(source, dest, SQRT2, edgeList);
         }
 
         return edgeList;
@@ -176,7 +177,7 @@ public class TileGraph implements Serializable {
 
     /**
      * Check if both the {@code source} and {@code dest} Nodes are reachable. If they are,
-     * add a new Edge to the {@code edgeList}.
+     * add a new Edge with weight 1 to the {@code edgeList}.
      * 
      * @param source Node new Edge would be leaving
      * @param dest Node new Edge would be going towards
@@ -185,6 +186,21 @@ public class TileGraph implements Serializable {
     private void tryAddingEdge(Node source, Node dest, List<Edge> edgeList) {
         if (source.reachable && dest.reachable) {
             edgeList.add(new Edge(source, dest));
+        }
+    }
+
+    /**
+     * Check if both the {@code source} and {@code dest} Nodes are reachable. If they are,
+     * add a new Edge to the {@code edgeList}.
+     * 
+     * @param source Node new Edge would be leaving
+     * @param dest Node new Edge would be going towards
+     * @param weight double for weight of the new Edge
+     * @param edgeList List of Edges new Edge would be added to
+     */
+    private void tryAddingEdge(Node source, Node dest, double weight, List<Edge> edgeList) {
+        if (source.reachable && dest.reachable) {
+            edgeList.add(new Edge(source, dest, weight));
         }
     }
 

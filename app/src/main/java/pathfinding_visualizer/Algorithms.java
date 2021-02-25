@@ -66,7 +66,7 @@ public class Algorithms {
                 actions.add(reconstructPath(previous, end));
                 break;
             } else if (!curr.equals(start)) {
-                actions.add(String.format("visit %d %d", curr.row, curr.col));
+                actions.add(visit(curr));
             }
 
             for (Edge e : graph.getNeighbors(curr)) {
@@ -117,7 +117,7 @@ public class Algorithms {
                 actions.add(reconstructPath(prev, end));
                 break;
             } else if (!curr.equals(start)) {
-                actions.add(String.format("visit %d %d", curr.row, curr.col));
+                actions.add(visit(curr));
             }
 
             for (Edge e : graph.getNeighbors(curr)) {
@@ -134,5 +134,74 @@ public class Algorithms {
         }
 
         return actions;
+    }
+
+    public static List<String> aStar(Pair<Integer, Integer> sourceCoord, Pair<Integer, Integer> destCoord, TileGraph graph) {
+        List<String> actions = new ArrayList<>();
+        Node start = graph.getNode(sourceCoord.first, sourceCoord.second);
+        Node end = graph.getNode(destCoord.first, destCoord.second);
+
+        Map<Node, Double> dist = new HashMap<>();
+        Map<Node, Node> prev = new HashMap<>();
+        Set<Node> visited = new HashSet<>();
+        PriorityQueue<Node> pq = new PriorityQueue<>(graph.numNodes(), 
+            (a, b) -> {
+                int comparison = Double.compare(dist.get(a), dist.get(b));
+                if (comparison == 0) {
+                    double predictedARemaining = heuristic(a, end, graph);
+                    double predictedBRemaining = heuristic(b, end, graph);
+                    return Double.compare(predictedARemaining, predictedBRemaining);
+                }
+                return comparison;
+            }
+        );
+
+        dist.put(start, 0.0);
+        prev.put(start, null);
+        visited.add(start);
+        pq.add(start);
+
+        while (!pq.isEmpty()) {
+            Node curr = pq.remove();
+            
+            if (curr.equals(end)) {
+                actions.add(reconstructPath(prev, end));
+                break;
+            } else if (!curr.equals(start)) {
+                actions.add(visit(curr));
+            }
+
+            for (Edge e : graph.getNeighbors(curr)) {
+                Node next = e.dest;
+                if (visited.contains(next)) {
+                    continue;
+                }
+
+                prev.put(next, curr);
+                dist.put(next, dist.get(curr) + e.weight);
+                pq.add(next);
+                visited.add(next);
+            }
+        }
+
+        return actions;
+    }
+
+    private static String visit(Node n) {
+        return String.format("visit %d %d", n.row, n.col);
+    }
+
+    private static double heuristic(Node a, Node b, TileGraph graph) {
+        if (graph.diagonalsConnected()) {
+            //euclidean distance
+            int deltaX = a.col - b.col;
+            int deltaY = a.row - b.row;
+            return Math.sqrt((double) deltaX * deltaX + deltaY * deltaY);
+        } else {
+            //manhattan distance
+            int deltaX = Math.abs(a.col - b.col);
+            int deltaY = Math.abs(a.row - b.row);
+            return (double) deltaX + deltaY;
+        }
     }
 }
