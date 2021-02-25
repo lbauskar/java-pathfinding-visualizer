@@ -218,7 +218,9 @@ public class TileGraph implements Serializable {
         for (int row = 0; row < graph.size(); ++row) {
             List<Pair<Node, ArrayList<Edge>>> list = graph.get(row);
             for (Pair<Node, ArrayList<Edge>> p : list) {
+                //String s1 = p.second.toString();
                 Collections.sort(p.second); //sort so that string output is consistent
+                //String s2 = p.second.toString();
                 sb.append(p.first.toString());
                 sb.append(':');
                 sb.append(p.second.toString());

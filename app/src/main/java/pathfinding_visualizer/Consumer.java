@@ -4,7 +4,7 @@ package pathfinding_visualizer;
  * Retrieves String messages from a {@link Producer}.
  */
 public abstract class Consumer extends Thread {
-    protected Producer producer;
+    private Producer producer;
 
     /**
      * Creates a Consumer that listens to the {@code producer}.

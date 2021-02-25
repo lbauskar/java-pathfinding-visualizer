@@ -40,6 +40,7 @@ public class Menu extends JPanel {
         this.add(algorithmSelector());
         this.add(clearButton());
         this.add(eraseButton());
+        this.add(mazeButton());
 
         for (Component component : this.getComponents()) {
             component.setBackground(bg);
@@ -69,7 +70,7 @@ public class Menu extends JPanel {
                 producer.sendMessage(message);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                Thread.currentThread().interrupt();
+                System.exit(1);
             }
         });
 
@@ -98,7 +99,7 @@ public class Menu extends JPanel {
                 producer.sendMessage(message);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                Thread.currentThread().interrupt();
+                System.exit(1);
             }
         });
         wall.addActionListener(event -> {
@@ -107,7 +108,7 @@ public class Menu extends JPanel {
                 producer.sendMessage(message);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                Thread.currentThread().interrupt();
+                System.exit(1);
             }
         });
 
@@ -145,7 +146,7 @@ public class Menu extends JPanel {
                 producer.sendMessage(message);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                Thread.currentThread().interrupt();
+                System.exit(1);
             }
         });
 
@@ -180,7 +181,7 @@ public class Menu extends JPanel {
                 producer.sendMessage(message);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                Thread.currentThread().interrupt();
+                System.exit(1);
             }
         });
 
@@ -231,7 +232,7 @@ public class Menu extends JPanel {
                     producer.sendMessage(message);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                    Thread.currentThread().interrupt();
+                    System.exit(1);
                 }
             }
         );
@@ -259,7 +260,7 @@ public class Menu extends JPanel {
                     producer.sendMessage(message);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                    Thread.currentThread().interrupt();
+                    System.exit(1);
                 }
             }
         );
@@ -285,7 +286,7 @@ public class Menu extends JPanel {
                     producer.sendMessage(message);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                    Thread.currentThread().interrupt();
+                    System.exit(1);
                 }
             }
         );
@@ -310,7 +311,26 @@ public class Menu extends JPanel {
                     producer.sendMessage(message);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                    Thread.currentThread().interrupt();
+                    System.exit(1);
+                }
+            }
+        );
+
+        JPanel panel = new JPanel();
+        panel.add(button);
+        return panel;
+    }
+
+    private JPanel mazeButton() {
+        JButton button = new JButton ("Make Maze");
+        button.addActionListener(
+            event -> {
+                String message = "maze";
+                try {
+                    producer.sendMessage(message);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    System.exit(1);
                 }
             }
         );

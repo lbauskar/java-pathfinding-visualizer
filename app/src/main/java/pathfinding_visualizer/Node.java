@@ -64,7 +64,7 @@ public class Node implements Comparable<Node>, Serializable {
     @Override
     public int compareTo(Node other) {
         int rowComp = ((Integer) this.row).compareTo(other.row);
-        int colComp = ((Integer) this.col).compareTo(other.row);
+        int colComp = ((Integer) this.col).compareTo(other.col);
         if (rowComp == 0) {
             return colComp;
         } else {

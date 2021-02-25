@@ -27,6 +27,11 @@ public class Pair<T extends Serializable, U extends Serializable> implements Ser
         this.second = second;
     }
 
+    public Pair(Pair<T, U> pair) {
+        this.first = pair.first;
+        this.second = pair.second;
+    }
+
 
     /**
      * Checks if {@code other} is the same class as this Pair, and that the {@code first} and {@code second} fields 

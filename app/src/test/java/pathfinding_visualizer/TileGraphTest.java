@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
-public class GraphTest {
+public class TileGraphTest {
     final String dir = "src/test/java/pathfinding_visualizer/";
 
 

@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Rectangular, gridded tilemap used for pathfinding visualization.
@@ -104,7 +105,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
                         SwingUtilities.invokeAndWait(() -> parseMessages(message));
                     } catch (InvocationTargetException | InterruptedException e) {
                         e.printStackTrace();
-                        Thread.currentThread().interrupt();
+                        System.exit(1);
                     }
                 }
 			}
@@ -260,9 +261,26 @@ public class TileGrid extends JPanel implements MouseInputListener {
                 resizeGrid(tileX, tileY);
                 break;
 
+            case "maze":
+                makeMaze();
+                break;
+
+
             default:
                 // System.out.println("Unknown message " + message);
                 break;
+        }
+    }
+
+    /**
+     * TODO
+     */
+    private void makeMaze() {
+        resizeGrid(tileX, tileY);
+        Set<Pair<Integer, Integer>> walls = Algorithms.makeMaze(sourceCoord, destCoord, graph, tileX, tileY);
+
+        for (Pair<Integer, Integer> p : walls) {
+            paintTile(p.first, p.second, Pallete.WALL);
         }
     }
 
@@ -418,8 +436,35 @@ public class TileGrid extends JPanel implements MouseInputListener {
         }
 
 
-        graph.setNodeReachability(row, col, paintColor != Color.black);
+        graph.setNodeReachability(row, col, paintColor != Pallete.WALL);
         tiles.get(row).get(col).setBackground(paintColor);
+    }
+
+    /**
+     * Attempts to paint the tile located at the coordinate {@code (row, col)}. 
+     * Will not paint over tiles located at {@code sourceCoord} or {@code destCoord}.
+     * This function will also not paint tiles that are outside the bounds of the grid.
+     * <p>
+     * Also modified properties of underlying graph depending on what color is painted. 
+     * For example, if you paint a tile as a wall, then the corresponding node will be marked 
+     * as unreachable.
+     * 
+     * @param row row on which tile to paint is located
+     * @param col column on which tile to paint is located
+     * @param color Color with which you want to paint the tile
+     */
+    private void paintTile(int row, int col, Color color) {
+        Pair<Integer, Integer> coord = new Pair<>(row, col);
+        if (coord.equals(sourceCoord) || coord.equals(destCoord)) {
+            return;
+        }
+        if (row < 0 || row >= tileY || col < 0 || col >= tileX) {
+            return;
+        }
+
+
+        graph.setNodeReachability(row, col, color != Pallete.WALL);
+        tiles.get(row).get(col).setBackground(color);
     }
 
     /**

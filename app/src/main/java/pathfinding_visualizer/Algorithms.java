@@ -235,4 +235,148 @@ public class Algorithms {
             return (double) deltaX + deltaY;
         }
     }
+
+    /**
+     * Turns {@code graph} into a gridded maze via randomized depth-first search
+     * 
+     * @param sourceCoord Pair of Integers equal to location of source tile
+     * @param destCoord Pair of Integers equal to location of destination tile
+     * @param graph TileGraph this algorithm will run on
+     * @param width width of {@code graph}
+     * @param height height of {@code graph}
+     * @return Set of Integer Pairs that correspond to the tiles that should be walls
+     */
+    public static Set<Pair<Integer, Integer>> makeMaze(Pair<Integer, Integer> sourceCoord, Pair<Integer, Integer> destCoord, TileGraph graph, int width, int height) {
+        Set<Pair<Integer, Integer>> walls = new HashSet<>();
+
+        // Create grid of walls aligned to even rows and columns
+        for (int row = 0; row < height; ++row) {
+            for (int col = 0; col < width; ++col) {
+                Pair<Integer, Integer> p = new Pair<>(row, col);
+                if (adjacentPairs(p, sourceCoord) || adjacentPairs(p, destCoord)) {
+                    continue; //source and destination nodes must never be walls or surrounded by them
+                }
+
+                if (row % 2 == 0 || col % 2 == 0) {
+                    graph.setNodeReachability(row, col, false);
+                    walls.add(p);
+                }
+            }
+        }
+
+        // If source is aligned with walls, start near source instead
+        Pair<Integer, Integer> startCoord = new Pair<>(sourceCoord);
+        if (startCoord.first % 2 == 0) {
+            startCoord.first = startCoord.first > 0 ? startCoord.first - 1 : startCoord.first + 1;
+        }
+        if (startCoord.second % 2 == 0) {
+            startCoord.second = startCoord.second > 0 ? startCoord.second - 1 : startCoord.second + 1;
+        }
+        Node start = graph.getNode(startCoord.first, startCoord.second);
+        
+        Set<Node> visited = new HashSet<>();
+        Deque<Node> stack = new LinkedList<>();  // use Deque because Stack is synchronized
+        Random rand = new Random(System.currentTimeMillis());
+
+        stack.add(start);
+        visited.add(start);
+
+        while (!stack.isEmpty()) {
+            Node curr = stack.pop();
+            List<Node> neighbors = unvisitedMazeNeighbors(curr, width, height, graph, visited);
+            
+            if (!neighbors.isEmpty()) {
+                stack.add(curr);
+                int index = Math.abs(rand.nextInt()) % neighbors.size();
+                Node next = neighbors.get(index);
+
+                Pair<Integer, Integer> wallCoord;
+                if (next.row < curr.row) { // neighbor above
+                    wallCoord = new Pair<>(curr.row - 1, curr.col);
+                } else if (next.row > curr.row) { // below
+                    wallCoord = new Pair<>(curr.row + 1, curr.col);
+                } else if (next.col < curr.col) { // left 
+                    wallCoord = new Pair<>(curr.row, curr.col - 1);
+                } else { // right
+                    wallCoord = new Pair<>(curr.row, curr.col + 1);
+                }
+
+                graph.setNodeReachability(wallCoord.first, wallCoord.second, true);
+                walls.remove(wallCoord);
+
+                visited.add(next);
+                stack.add(next);
+            }
+        }
+
+        return walls;
+    }
+
+    /**
+     * Returns a list of nodes that satisfy two properties.
+     * <ol>
+     * <li> The Node is distance 2 away, or has one Node between it and {@code curr}
+     * <li> The Node is not in {@code visited}
+     * </ol>
+     * This was written as a support function for {@link #makeMaze}
+     * 
+     * @param curr Node to find "neighbors" of 
+     * @param width width of {@code graph}
+     * @param height height of {@code graph}
+     * @param graph TileGraph the Nodes are in
+     * @param visited Set of Nodes that have been visited by {@code makeMaze}
+     * @return List of Nodes that satisfy properties in the description
+     */
+    private static List<Node> unvisitedMazeNeighbors(Node curr, int width, int height, TileGraph graph, Set<Node> visited) {
+        int r = curr.row;
+        int c = curr.col;
+
+        boolean top = r >= 2;
+        boolean bottom = r < height - 2;
+        boolean left = c >= 2;
+        boolean right = c < width - 2;
+
+        List<Node> neighbors = new ArrayList<>();
+
+        if (top) {
+            neighbors.add(graph.getNode(r - 2, c));
+        }
+        if (left) {
+            neighbors.add(graph.getNode(r, c - 2));
+        }
+        if (right) {
+            neighbors.add(graph.getNode(r, c + 2));
+        }
+        if (bottom) {
+            neighbors.add(graph.getNode(r + 2, c));
+        }
+
+        List<Node> toRemove = new ArrayList<>();
+        for (Node n : neighbors) {
+            if (visited.contains(n)) {
+                toRemove.add(n);
+            }
+        }
+
+        for (Node n : toRemove) {
+            neighbors.remove(n);
+        }
+
+        return neighbors;
+    }
+
+    /**
+     * Determines if two pairs are within sqrt(2) euclidean distance from each other
+     * 
+     * @param a Pair of Integers being checked
+     * @param b Pair of Integers being checked
+     * @return true if {@code a} and {@code b} are within sqrt(2) euclidean distance, false otherwise
+     */
+    private static boolean adjacentPairs(Pair<Integer, Integer> a, Pair<Integer, Integer> b) {
+        int rowDiff = Math.abs(a.first - b.first);
+        int colDiff = Math.abs(a.second - b.second);
+
+        return rowDiff <= 1 && colDiff <= 1;
+    }
+
 }
