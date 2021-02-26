@@ -88,6 +88,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
      */
     public TileGrid(int width, int height, Producer producer) {
         this.addMouseMotionListener(this);
+        this.setBackground(Pallete.WALL);
 
         if (width < 4 || width > 99 || height < 4 || height > 99) {
             width = 4;
@@ -98,7 +99,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
         changeSource(0, 0);
         changeDest(tileX - 1, tileY - 1);
 
-        Consumer consumer = new Consumer(producer) {
+        new Consumer(producer) {
 			@Override
 			public void run() {
                 while (true) {
@@ -274,12 +275,15 @@ public class TileGrid extends JPanel implements MouseInputListener {
     }
 
     /**
-     * TODO
+     * Creates a maze using a randomized DFS algorithm.
+     * <p>
+     * The maze creation is done in a TileGraph, then whatever tiles that are marked as walls
+     * become painted as such.
      */
     private void makeMaze() {
         resizeGrid(tileX, tileY);
         Set<Pair<Integer, Integer>> walls = 
-            Algorithms.makeMaze(sourceCoord, destCoord, graph, tileX, tileY, new Random(System.currentTimeMillis()));
+            Algorithms.makeMaze(sourceCoord, destCoord, graph, new Random(System.currentTimeMillis()));
 
         for (Pair<Integer, Integer> p : walls) {
             paintTile(p.first, p.second, Pallete.WALL);

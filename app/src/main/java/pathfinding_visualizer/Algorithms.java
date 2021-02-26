@@ -139,8 +139,8 @@ public class Algorithms {
     }
 
     /**
-     * A* Algorithm. Similar to Djikstra's Algorithm, but when two nodes have and equal distance value, a heuristic is used to pick
-     * the node "closer" to the destination. 
+     * A* Algorithm. Similar to Djikstra's Algorithm, but uses a heuristic in addition to the total distance travelled to 
+     * determine which node to pick next.
      * <p>
      * If diagonal traversal is allowed the euclidian distance between the current and destination node is used. If diagonal
      * traversal is not allowed, manhattan distance is used instead.
@@ -161,18 +161,13 @@ public class Algorithms {
         Map<Node, Node> prev = new HashMap<>();
         Set<Node> visited = new HashSet<>();
         PriorityQueue<Node> pq = new PriorityQueue<>(graph.numNodes(), 
-            (a, b) -> {
-                int comparison = Double.compare(dist.get(a), dist.get(b));
-                if (comparison == 0) {
-                    double predictedARemaining = heuristic(a, end, graph);
-                    double predictedBRemaining = heuristic(b, end, graph);
-                    return Double.compare(predictedARemaining, predictedBRemaining);
-                }
-                return comparison;
-            }
+            (a, b) -> Double.compare(
+                    dist.get(a) + heuristic(a, end, graph), 
+                    dist.get(b) + heuristic(b, end, graph)
+            )
         );
 
-        dist.put(start, 0.0);
+        dist.put(start, heuristic(start, end, graph));
         prev.put(start, null);
         visited.add(start);
         pq.add(start);
@@ -190,6 +185,21 @@ public class Algorithms {
             for (Edge e : graph.getNeighbors(curr)) {
                 Node next = e.dest;
                 if (visited.contains(next)) {
+                    /*
+                     * TileGraphs exist in metric space, that is:
+                     * - every edge weight is positive
+                     * - dist(a, b) <= dist(a, c) + dist(c, b). Where dist() is the distance between two nodes.
+                     * - dist(a, a) = 0
+                     * - dist(a, b) = dist(b, a)
+                     * 
+                     * Because TileGraphs are in metric space, the heuristic is consistent/monotone rather than just admissible.
+                     * This means the distance travelled to visit a node the first time is the shortest path to that node - even 
+                     * with the heuristic.
+                     * 
+                     * Under normal circumstances, you would need to recheck a node's distance every time you visit it because 
+                     * it could have been visited by a shorter path than a previous one you took to reach that node. However, we know
+                     * the first path used to reach the node is the shortest one, so we can safely ignore the node and continue.
+                     */
                     continue;
                 }
 
@@ -242,37 +252,11 @@ public class Algorithms {
      * @param sourceCoord Pair of Integers equal to location of source tile
      * @param destCoord Pair of Integers equal to location of destination tile
      * @param graph TileGraph this algorithm will run on
-     * @param width width of {@code graph}
-     * @param height height of {@code graph}
      * @return Set of Integer Pairs that correspond to the tiles that should be walls
      */
-    public static Set<Pair<Integer, Integer>> makeMaze(Pair<Integer, Integer> sourceCoord, Pair<Integer, Integer> destCoord, TileGraph graph, int width, int height, Random random) {
+    public static Set<Pair<Integer, Integer>> makeMaze(Pair<Integer, Integer> sourceCoord, Pair<Integer, Integer> destCoord, TileGraph graph, Random random) {
         Set<Pair<Integer, Integer>> walls = new HashSet<>();
-
-        // Create grid of walls aligned to even rows and columns
-        for (int row = 0; row < height; ++row) {
-            for (int col = 0; col < width; ++col) {
-                Pair<Integer, Integer> p = new Pair<>(row, col);
-                if (adjacentPairs(p, sourceCoord) || adjacentPairs(p, destCoord)) {
-                    continue; //source and destination nodes must never be walls or surrounded by them
-                }
-
-                if (row % 2 == 0 || col % 2 == 0) {
-                    graph.setNodeReachability(row, col, false);
-                    walls.add(p);
-                }
-            }
-        }
-
-        // If source is aligned with walls, start near source instead
-        Pair<Integer, Integer> startCoord = new Pair<>(sourceCoord);
-        if (startCoord.first % 2 == 0) {
-            startCoord.first = startCoord.first > 0 ? startCoord.first - 1 : startCoord.first + 1;
-        }
-        if (startCoord.second % 2 == 0) {
-            startCoord.second = startCoord.second > 0 ? startCoord.second - 1 : startCoord.second + 1;
-        }
-        Node start = graph.getNode(startCoord.first, startCoord.second);
+        Node start = prepareGraphForMaze(sourceCoord, destCoord, graph, walls);
         
         Set<Node> visited = new HashSet<>();
         Deque<Node> stack = new LinkedList<>();  // use Deque because Stack is synchronized
@@ -282,7 +266,7 @@ public class Algorithms {
 
         while (!stack.isEmpty()) {
             Node curr = stack.pop();
-            List<Node> neighbors = unvisitedMazeNeighbors(curr, width, height, graph, visited);
+            List<Node> neighbors = unvisitedMazeNeighbors(curr, graph, visited);
             
             if (neighbors.isEmpty()) {
                 continue;
@@ -321,20 +305,18 @@ public class Algorithms {
      * This was written as a support function for {@link #makeMaze}
      * 
      * @param curr Node to find "neighbors" of 
-     * @param width width of {@code graph}
-     * @param height height of {@code graph}
      * @param graph TileGraph the Nodes are in
      * @param visited Set of Nodes that have been visited by {@code makeMaze}
      * @return List of Nodes that satisfy properties in the description
      */
-    private static List<Node> unvisitedMazeNeighbors(Node curr, int width, int height, TileGraph graph, Set<Node> visited) {
+    private static List<Node> unvisitedMazeNeighbors(Node curr, TileGraph graph, Set<Node> visited) {
         int r = curr.row;
         int c = curr.col;
 
         boolean top = r >= 2;
-        boolean bottom = r < height - 2;
+        boolean bottom = r < graph.getHeight() - 2;
         boolean left = c >= 2;
-        boolean right = c < width - 2;
+        boolean right = c < graph.getWidth() - 2;
 
         List<Node> neighbors = new ArrayList<>();
 
@@ -377,6 +359,47 @@ public class Algorithms {
         int colDiff = Math.abs(a.second - b.second);
 
         return rowDiff <= 1 && colDiff <= 1;
+    }
+
+    /**
+     * Turns even row and every even column of Nodes in {@code graph} to walls, or makes them unreachable.
+     * <p>
+     * This is done to prepare {@code graph} for the algorithm used in {@link #makeMaze}, and this method
+     * was written as a support function for {@code makeMaze}. Because of this, it is not recommended to 
+     * call this method on its own.
+     * 
+     * @param sourceCoord Pair of Integers equal to the location of the source tile
+     * @param destCoord Pair of Integers equal to the location of the destination tile
+     * @param graph TileGraph being modified
+     * @param walls empty Set of Nodes that will later contain all unreachable Nodes
+     * @return Node the maze creation algorithm should start from
+     */
+    private static Node prepareGraphForMaze(Pair<Integer, Integer> sourceCoord, Pair<Integer, Integer> destCoord, TileGraph graph, Set<Pair<Integer, Integer>> walls) {
+        // Create grid of walls aligned to even rows and columns
+        for (int row = 0; row < graph.getHeight(); ++row) {
+            for (int col = 0; col < graph.getWidth(); ++col) {
+                Pair<Integer, Integer> p = new Pair<>(row, col);
+                if (adjacentPairs(p, sourceCoord) || adjacentPairs(p, destCoord)) {
+                    continue; //source and destination nodes must never be walls or surrounded by them
+                }
+
+                if (row % 2 == 0 || col % 2 == 0) {
+                    graph.setNodeReachability(row, col, false);
+                    walls.add(p);
+                }
+            }
+        }
+
+        // If source is aligned with walls, start near source instead
+        Pair<Integer, Integer> startCoord = new Pair<>(sourceCoord);
+        if (startCoord.first % 2 == 0) {
+            startCoord.first = startCoord.first > 0 ? startCoord.first - 1 : startCoord.first + 1;
+        }
+        if (startCoord.second % 2 == 0) {
+            startCoord.second = startCoord.second > 0 ? startCoord.second - 1 : startCoord.second + 1;
+        }
+
+        return graph.getNode(startCoord.first, startCoord.second);
     }
 
 }

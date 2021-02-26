@@ -56,7 +56,7 @@ public class ConsumerTest {
             }
         };
 
-        Thread.sleep(100);
-        assertTrue(c.isAlive() || c.isInterrupted());
+        Thread.sleep(50);
+        assertTrue(c.isAlive());
     }
 }

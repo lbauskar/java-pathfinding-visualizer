@@ -133,7 +133,7 @@ public class AlgorithmsTest {
         TileGraph g = new TileGraph(10, 10, false);
         Random random = new Random(2021);
         FileWriter out = new FileWriter(outDir + "out.txt");
-        String s = Algorithms.makeMaze(source, dest, g, 10, 10, random).toString();
+        String s = Algorithms.makeMaze(source, dest, g, random).toString();
         out.write(s);
         out.close();
         assertTrue(fileEquality("out.txt", "10x10_maze.txt"));
@@ -141,7 +141,7 @@ public class AlgorithmsTest {
         g = new TileGraph(10, 10, false);
         random = new Random(2021);
         out = new FileWriter("out.txt");
-        s = Algorithms.makeMaze(dest, source, g, 10, 10, random).toString();
+        s = Algorithms.makeMaze(dest, source, g, random).toString();
         out.write(s);
         out.close();
         assertTrue(fileEquality("out.txt", "10x10_maze2.txt"));
@@ -151,7 +151,7 @@ public class AlgorithmsTest {
         random = new Random(2021);
         out = new FileWriter("out.txt");
         Pair<Integer, Integer> source2 = new Pair<>(2, 2);
-        s = Algorithms.makeMaze(source2, dest, g, 10, 10, random).toString();
+        s = Algorithms.makeMaze(source2, dest, g, random).toString();
         out.write(s);
         out.close();
         assertTrue(fileEquality("out.txt", "10x10_maze3.txt"));

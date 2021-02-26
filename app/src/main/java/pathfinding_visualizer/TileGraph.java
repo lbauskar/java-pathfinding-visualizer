@@ -288,4 +288,25 @@ public class TileGraph implements Serializable {
         return connectDiagonals;
     }
 
+    /**
+     * A TileGraph's width is the number of Nodes it has along
+     * the x-axis, or the number of columns it has in its 
+     * 2D Node array.
+     * 
+     * @return the width of this TileGraph
+     */
+    public int getWidth() {
+        return width;
+    }
+
+    /**
+     * A TileGraph's height is the number of Nodes it has along the y-axis,
+     * or the number of rows it has in it 2D Node array.
+     * 
+     * @return the height of this TileGraph
+     */
+    public int getHeight() {
+        return height;
+    }
+
 }
