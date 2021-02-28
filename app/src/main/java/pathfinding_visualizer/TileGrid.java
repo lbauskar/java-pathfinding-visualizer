@@ -18,18 +18,18 @@ public class TileGrid extends JPanel implements MouseInputListener {
 
     /**
      * A 2D array of JPanels that keeps track of the tiles in the grid. This array
-     * should have {@link #tileY} rows and {@link #tileX} columns.
+     * should have {@link #numCols} rows and {@link #numRows} columns.
      */
     private ArrayList<ArrayList<JPanel>> tiles;
 
     /**
      * How many tiles wide the grid is, or number of tiles along the x-axis.
      */
-    private int tileX;
+    private int numRows;
     /**
      * How many tiles tall the grid is, or number of tiles along the y-axis.
      */
-    private int tileY;
+    private int numCols;
     /**
      * The paint a user uses when dragging their mouse across the grid.
      */
@@ -95,9 +95,9 @@ public class TileGrid extends JPanel implements MouseInputListener {
             height = 4;
         }
 
-        resizeGrid(width, height);
+        resizeGrid(height, width);
         changeSource(0, 0);
-        changeDest(tileX - 1, tileY - 1);
+        changeDest(numRows - 1, numCols - 1);
 
         new Consumer(producer) {
 			@Override
@@ -116,12 +116,12 @@ public class TileGrid extends JPanel implements MouseInputListener {
     }
 
     /**
-     * Resizes this {@link TileGrid} to make it {@code width} tiles wide and
-     * {@code height} tiles tall. {@code width} and {@code height} are not pixel
+     * Resizes this {@link TileGrid} to make it {@code cols} tiles wide and
+     * {@code rows} tiles tall. {@code rows} and {@code cols} are not pixel
      * measurements.
      * <p>
      * <ul>
-     * <li>This function will do nothing if either {@code width} or {@code height}
+     * <li>This function will do nothing if either {@code rows} or {@code cols}
      * is less than 4 or greater than 99.
      * <li>If the {@link #sourceCoord} or {@link #destCoord} fields of this TileGrid
      * fall outside the grid after resizing, their values will be changed to put
@@ -129,26 +129,26 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * </ul>
      * <p>
      * 
-     * @param width  number of tiles this resized grid should have along the x-axis
-     * @param height number of tiles this resized grid should have along the y-axis
+     * @param rows  number of tiles this resized grid should have along the y-axis
+     * @param cols number of tiles this resized grid should have along the x-axis
      */
-    private void resizeGrid(int width, int height) {
-        if (width < 4 || width > 99 || height < 4 || height > 99) {
+    private void resizeGrid(int rows, int cols) {
+        if (rows < 4 || rows > 99 || cols < 4 || cols > 99) {
             return;
         }
         this.removeAll();
-        tileX = width;
-        tileY = height;
+        numRows = rows;
+        numCols = cols;
 
-        GridLayout layout = new GridLayout(width, height);
+        GridLayout layout = new GridLayout(rows, cols);
         this.setLayout(layout);
 
-        makeTiles(width, height);
-        graph = new TileGraph(width, height, connectDiagonals);
+        makeTiles(rows, cols);
+        graph = new TileGraph(rows, cols, connectDiagonals);
 
         int x = sourceCoord.first;
         int y = sourceCoord.second;
-        if (x < 0 || x >= tileX || y < 0 || y >= tileY) {
+        if (x < 0 || x >= numRows || y < 0 || y >= numCols) {
             changeSource(0, 0);
         } else {
             changeSource(x, y);
@@ -156,8 +156,8 @@ public class TileGrid extends JPanel implements MouseInputListener {
 
         x = destCoord.first;
         y = destCoord.second;
-        if (x < 0 || x >= tileX || y < 0 || y >= tileY) {
-            changeDest(tileX - 1, tileY - 1);
+        if (x < 0 || x >= numRows || y < 0 || y >= numCols) {
+            changeDest(numRows - 1, numCols - 1);
         } else {
             changeDest(x, y);
         }
@@ -173,21 +173,20 @@ public class TileGrid extends JPanel implements MouseInputListener {
 
     /**
      * Creates a grid of JPanel tiles that fill in this {@link TileGrid}. There will
-     * be {@code width} number of columns and {@code height} number of rows of
-     * tiles.
+     * be {@code rows} number of rows and @code cols} number of columns.
      * 
      * If tiles were already present, this function will destroy those tiles and
      * make new ones.
      * 
-     * @param width  number of tiles the grid will have along the x-axis
-     * @param height number of tiles the grid will have along the y-axis
+     * @param rows  number of tiles the grid will have along the x-axis
+     * @param cols number of tiles the grid will have along the y-axis
      */
-    private void makeTiles(int width, int height) {
+    private void makeTiles(int rows, int cols) {
         tiles = new ArrayList<>();
-        for (int row = 0; row < height; ++row) {
+        for (int row = 0; row < rows; ++row) {
             ArrayList<JPanel> list = new ArrayList<>();
             tiles.add(list);
-            for (int col = 0; col < width; ++col) {
+            for (int col = 0; col < cols; ++col) {
                 JPanel tile = new JPanel();
                 tile.setBackground(Pallete.CLEAR);
                 list.add(tile);
@@ -222,7 +221,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
             case "resize":
                 int width = Integer.parseInt(args[1]);
                 int height = Integer.parseInt(args[2]);
-                resizeGrid(width, height);
+                resizeGrid(height, width);
                 break;
 
             case "paint":
@@ -234,14 +233,14 @@ public class TileGrid extends JPanel implements MouseInputListener {
                 break;
 
             case "source":
-                int row = Integer.parseInt(args[1]);
-                int col = Integer.parseInt(args[2]);
+                int row = Integer.parseInt(args[2]);
+                int col = Integer.parseInt(args[1]);
                 changeSource(row, col);
                 break;
 
             case "destination":
-                row = Integer.parseInt(args[1]);
-                col = Integer.parseInt(args[2]);
+                row = Integer.parseInt(args[2]);
+                col = Integer.parseInt(args[1]);
                 changeDest(row, col);
                 break;
 
@@ -260,7 +259,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
                 break;
 
             case "erase":
-                resizeGrid(tileX, tileY);
+                resizeGrid(numRows, numCols);
                 break;
 
             case "maze":
@@ -281,7 +280,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * become painted as such.
      */
     private void makeMaze() {
-        resizeGrid(tileX, tileY);
+        resizeGrid(numRows, numCols);
         Set<Pair<Integer, Integer>> walls = 
             Algorithms.makeMaze(sourceCoord, destCoord, graph, new Random(System.currentTimeMillis()));
 
@@ -433,17 +432,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * @param col column on which tile to paint is located
      */
     private void paintTile(int row, int col) {
-        Pair<Integer, Integer> coord = new Pair<>(row, col);
-        if (coord.equals(sourceCoord) || coord.equals(destCoord)) {
-            return;
-        }
-        if (row < 0 || row >= tileY || col < 0 || col >= tileX) {
-            return;
-        }
-
-
-        graph.setNodeReachability(row, col, paintColor != Pallete.WALL);
-        tiles.get(row).get(col).setBackground(paintColor);
+        paintTile(row, col, paintColor);
     }
 
     /**
@@ -464,7 +453,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
         if (coord.equals(sourceCoord) || coord.equals(destCoord)) {
             return;
         }
-        if (row < 0 || row >= tileY || col < 0 || col >= tileX) {
+        if (row < 0 || row >= numRows || col < 0 || col >= numCols) {
             return;
         }
 
@@ -486,7 +475,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * @param col column of new source tile location
      */
     private void changeSource(int row, int col) {
-        if (row < 0 || row >= tileX || col < 0 || col >= tileY) {
+        if (row < 0 || row >= numRows || col < 0 || col >= numCols) {
             return;
         }
 
@@ -511,7 +500,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * @param col column of new destination tile location
      */
     private void changeDest(int row, int col) {
-        if (row < 0 || row >= tileX || col < 0 || col >= tileY) {
+        if (row < 0 || row >= numRows || col < 0 || col >= numCols) {
             return;
         }
 

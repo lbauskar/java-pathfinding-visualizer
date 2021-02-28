@@ -255,8 +255,8 @@ public class Algorithms {
      * @return Set of Integer Pairs that correspond to the tiles that should be walls
      */
     public static Set<Pair<Integer, Integer>> makeMaze(Pair<Integer, Integer> sourceCoord, Pair<Integer, Integer> destCoord, TileGraph graph, Random random) {
-        Set<Pair<Integer, Integer>> walls = new HashSet<>();
-        Node start = prepareGraphForMaze(sourceCoord, destCoord, graph, walls);
+        Set<Pair<Integer, Integer>> walls = prepareGraphForMaze(sourceCoord, destCoord, graph);
+        Node start = determineStartingNode(sourceCoord, graph);
         
         Set<Node> visited = new HashSet<>();
         Deque<Node> stack = new LinkedList<>();  // use Deque because Stack is synchronized
@@ -314,9 +314,9 @@ public class Algorithms {
         int c = curr.col;
 
         boolean top = r >= 2;
-        boolean bottom = r < graph.getHeight() - 2;
+        boolean bottom = r < graph.getNumRows() - 2;
         boolean left = c >= 2;
-        boolean right = c < graph.getWidth() - 2;
+        boolean right = c < graph.getNumCols() - 2;
 
         List<Node> neighbors = new ArrayList<>();
 
@@ -348,17 +348,18 @@ public class Algorithms {
     }
 
     /**
-     * Determines if two pairs are within sqrt(2) euclidean distance from each other
+     * Determines if two pairs are cardinally next to each other or have a euclidean distance
+     * between them less than or equal to 1.
      * 
      * @param a Pair of Integers being checked
      * @param b Pair of Integers being checked
-     * @return true if {@code a} and {@code b} are within sqrt(2) euclidean distance, false otherwise
+     * @return true if {@code a} and {@code b} are within 1 euclidean distance, false otherwise
      */
     private static boolean adjacentPairs(Pair<Integer, Integer> a, Pair<Integer, Integer> b) {
         int rowDiff = Math.abs(a.first - b.first);
         int colDiff = Math.abs(a.second - b.second);
 
-        return rowDiff <= 1 && colDiff <= 1;
+        return rowDiff + colDiff <= 1;
     }
 
     /**
@@ -371,13 +372,13 @@ public class Algorithms {
      * @param sourceCoord Pair of Integers equal to the location of the source tile
      * @param destCoord Pair of Integers equal to the location of the destination tile
      * @param graph TileGraph being modified
-     * @param walls empty Set of Nodes that will later contain all unreachable Nodes
-     * @return Node the maze creation algorithm should start from
+     * @return Set of Integer Pair coordinates that denote the location of wall nodes
      */
-    private static Node prepareGraphForMaze(Pair<Integer, Integer> sourceCoord, Pair<Integer, Integer> destCoord, TileGraph graph, Set<Pair<Integer, Integer>> walls) {
+    private static Set<Pair<Integer, Integer>> prepareGraphForMaze(Pair<Integer, Integer> sourceCoord, Pair<Integer, Integer> destCoord, TileGraph graph) {
+        Set<Pair<Integer, Integer>> walls = new HashSet<>();
         // Create grid of walls aligned to even rows and columns
-        for (int row = 0; row < graph.getHeight(); ++row) {
-            for (int col = 0; col < graph.getWidth(); ++col) {
+        for (int row = 0; row < graph.getNumRows(); ++row) {
+            for (int col = 0; col < graph.getNumCols(); ++col) {
                 Pair<Integer, Integer> p = new Pair<>(row, col);
                 if (adjacentPairs(p, sourceCoord) || adjacentPairs(p, destCoord)) {
                     continue; //source and destination nodes must never be walls or surrounded by them
@@ -390,7 +391,25 @@ public class Algorithms {
             }
         }
 
-        // If source is aligned with walls, start near source instead
+        return walls;
+    }
+
+    /**
+     * Figures out which Node the maze creation algorithm should start from.
+     * <p>
+     * Writtena s a support function of {@link #makeMaze}. Not intended to be called outside of 
+     * that context.
+     * <p>
+     * The algorithm assumes that the starting tile is not aligned with the wall grid. However,
+     * {@code sourceCoord} sometimes is aligned with the walls. In such a case, we need to pick 
+     * a starting tile next to {@code sourceCoord} instead of on it.
+     * 
+     * @param sourceCoord Pair of Integers denoting the desired location of the starting Node
+     * @param graph TileGraph being operated on by {@code makeMaze}
+     * @return Node the maze creation algorithm should start on
+     */
+    private static Node determineStartingNode(Pair<Integer, Integer> sourceCoord, TileGraph graph) {
+        // makes the assumption that walls are on even rows and columns, because that's what prepareGraphForMaze does
         Pair<Integer, Integer> startCoord = new Pair<>(sourceCoord);
         if (startCoord.first % 2 == 0) {
             startCoord.first = startCoord.first > 0 ? startCoord.first - 1 : startCoord.first + 1;

@@ -84,27 +84,5 @@ public class ProducerTest {
         t.interrupt();
         String message = p.getMessage();
         assertEquals("interrupted", message);
-
-        t = new Thread(new Runnable() {
-            public void run() {
-                try {
-                    while (true) {
-                        p.sendMessage("blah");
-                    }
-                } catch (InterruptedException e) {
-                    try {
-                        p.getMessage();
-                    } catch (InterruptedException e1) {
-                        return;
-                    }
-                }
-            }
-        });
-        t.start();
-
-        Thread.sleep(50);
-        t.interrupt();
-        Thread.sleep(25);
-        assertEquals(Producer.MAX_QUEUE_SIZE - 1, p.size()); //check that 1 message was removed 
     }
 }

@@ -11,11 +11,11 @@ public class TileGraph implements Serializable {
     /**
      * Number of columns in the {@link #graph} field
      */
-    private int width;
+    private int rows;
     /**
      * Number of rows in the {@link #graph} field
      */
-    private int height;
+    private int cols;
     /**
      * Whether diagonal edges should be created. An example of a diagonal edge would
      * be one that connects the Node at (0, 0) and the Node at (1, 1).
@@ -24,24 +24,24 @@ public class TileGraph implements Serializable {
     private List<List<Pair<Node, ArrayList<Edge>>>> graph = new ArrayList<>();
 
     /**
-     * Creates a graph that corresponds to a {@link TileGrid}. The {@code width} and {@code height} 
-     * parameters should be equal to the parent {@code TileGrid}'s {@code tileX} and {@code tileY} fields
+     * Creates a graph that corresponds to a {@link TileGrid}. The {@code rows} and {@code cols} 
+     * parameters should be equal to the parent {@code TileGrid}'s {@code numRows} and {@code numCols} fields
      * respectively. The {@code connectDiagonals} parameter determines if tiles that touch diagonally
      * should be counted as neighbors and have edges between them.
      * 
-     * @param width Nodes wide the graph will be
-     * @param height Nodes tall the graph will be
+     * @param rows how many rows of Nodes there will be, or how many along y-axis
+     * @param cols how many columns of Nodes there will be, or how many along x-axis
      * @param connectDiagonals boolean for if diagonal edges should be made
      */
-    public TileGraph(int width, int height, boolean connectDiagonals) {
-        this.width = width;
-        this.height = height;
+    public TileGraph(int rows, int cols, boolean connectDiagonals) {
+        this.rows = rows;
+        this.cols = cols;
         this.connectDiagonals = connectDiagonals;
         
-        for (int row = 0; row < height; ++row) {
+        for (int row = 0; row < rows; ++row) {
             List<Pair<Node, ArrayList<Edge>>> list = new ArrayList<>();
             graph.add(list);
-            for (int col = 0; col < width; ++col) {
+            for (int col = 0; col < cols; ++col) {
                 list.add(new Pair<>(new Node(row, col), new ArrayList<>()));
             }
         }
@@ -55,15 +55,15 @@ public class TileGraph implements Serializable {
      * @return the number of Nodes in this graph
      */
     public int numNodes() {
-        return width * height;
+        return rows * cols;
     }
 
     /**
      * Replaces all edges in the graph with programatically generated new ones.
      */
     private void makeEdges() {
-        for (int row = 0; row < height; ++row) {
-            for (int col = 0; col < width; ++col) {
+        for (int row = 0; row < rows; ++row) {
+            for (int col = 0; col < cols; ++col) {
                 graph.get(row).get(col).second = makeNeighbors(getNode(row, col));
             }
         }
@@ -130,9 +130,9 @@ public class TileGraph implements Serializable {
         int r = source.row;
         int c = source.col;
         boolean top = r > 0;
-        boolean bottom = r < height - 1;
+        boolean bottom = r < rows - 1;
         boolean left = c > 0;
-        boolean right = c < width - 1;
+        boolean right = c < cols - 1;
         boolean diag = connectDiagonals;
         Node dest;
         final double SQRT2 = Math.sqrt(2);
@@ -295,8 +295,8 @@ public class TileGraph implements Serializable {
      * 
      * @return the width of this TileGraph
      */
-    public int getWidth() {
-        return width;
+    public int getNumRows() {
+        return rows;
     }
 
     /**
@@ -305,8 +305,8 @@ public class TileGraph implements Serializable {
      * 
      * @return the height of this TileGraph
      */
-    public int getHeight() {
-        return height;
+    public int getNumCols() {
+        return cols;
     }
 
 }
