@@ -21,11 +21,13 @@ public class App {
      * @param args command line arguments are ignored
      */
     public static void main(String[] args) {
+        System.setProperty("awt.useSystemAAFontSettings", "on"); //enable text anti-aliasing if system uses it
         JFrame frame = new MainWindow(1000, 500);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.pack();
         frame.setResizable(true);
         frame.setLocationRelativeTo(null);
+        frame.setTitle("Pathfinding Visualizer");
         frame.setVisible(true);
     }
 }

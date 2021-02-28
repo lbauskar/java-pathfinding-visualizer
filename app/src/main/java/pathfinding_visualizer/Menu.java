@@ -1,7 +1,6 @@
 package pathfinding_visualizer;
 
 import javax.swing.*;
-import javax.swing.text.*;
 import java.awt.*;
 
 /**
@@ -9,33 +8,36 @@ import java.awt.*;
  */
 public class Menu extends JPanel {
     private static final long serialVersionUID = -2183382640701870707L;
-    /**
-     * Default background color of all JPanels in this Menu
-     */
-    private static final Color bg = Color.gray;
+
     /**
      * Producer this Menu sends messages to
      */
     private Producer producer;
 
     /**
-     * Creates a Menu that sends messages using the {@code producer}. The {@link TileGrid}
-     * you want to modify use the same {@code producer} in its constructor.
+     * Creates a Menu that sends messages using the {@code producer}. The
+     * {@link TileGrid} you want to modify use the same {@code producer} in its
+     * constructor.
      * 
      * @param producer Producer you want this Menu to send messages with
      */
     public Menu(Producer producer) {
+        
+        //Use system theme for the menu
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); 
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                | UnsupportedLookAndFeelException e) {
+            // Do nothing. Use default look and feel.
+        }
+        
         this.producer = producer;
 
+        Color bg = Color.gray;
         this.setBackground(bg);
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        JLabel title = new JLabel();
-        title.setText("Pathfinding Visualizer");
-        this.add(title);
-
-        this.add(gridSizeForm());
-        this.add(paintSelector());
+        this.add(gridResizer());
         this.add(sourcePanel());
         this.add(destPanel());
         this.add(diagonalCheckbox());
@@ -44,86 +46,33 @@ public class Menu extends JPanel {
         this.add(eraseButton());
         this.add(mazeButton());
 
+        //make all component backgrounds match this Menu
         for (Component component : this.getComponents()) {
             component.setBackground(bg);
         }
     }
 
     /**
-     * Creates a panel with two text fields and one button.
-     * The text fields accept integers between 4 and 99. When the button is clicked,
-     * the connected TileGrid will change its width and height to match the text fields.
+     * Creates a panel with two text fields and one button. The text fields accept
+     * integers between 4 and 99. When the button is clicked, the connected TileGrid
+     * will change its width and height to match the text fields.
      * 
      * @return JPanel that modifies the size of the connected TileGrid.
      */
-    private JPanel gridSizeForm() {
+    private JPanel gridResizer() {
         JPanel form = new JPanel();
 
         JLabel xLabel = new JLabel("Tiles Wide: ");
         JLabel yLabel = new JLabel("Tiles Tall: ");
-        final JTextField xField = makeIntTextField(4, 99, 2, 20);
-        final JTextField yField = makeIntTextField(4, 99, 2, 20);
-
-        JButton button = new JButton("Set Grid");
-        button.addActionListener(event -> {
-            String message = String.format("resize %s %s", xField.getText().isEmpty() ? "-1" : xField.getText(),
-                    yField.getText().isEmpty() ? "-1" : yField.getText());
-            try {
-                producer.sendMessage(message);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-        });
+        JTextField xField = makeIntegerField(0, 100, 20, 3, "resize col");
+        JTextField yField = makeIntegerField(0, 100, 20, 3, "resize row");
 
         form.add(xLabel);
         form.add(xField);
         form.add(yLabel);
         form.add(yField);
-        form.add(button);
 
         return form;
-    }
-
-    /**
-     * Creates a JPanel that let's you pick paint colors via radio buttons.
-     * The paint colors let you modify the TileGrid by adding and removing walls.
-     * 
-     * @return JPanel that let's you pick which paint color to use
-     */
-    private JPanel paintSelector() {
-        final JRadioButton clear = new JRadioButton("erase");
-        final JRadioButton wall = new JRadioButton("wall", true);
-
-        clear.addActionListener(event -> {
-            String message = "paint clear";
-            try {
-                producer.sendMessage(message);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-        });
-        wall.addActionListener(event -> {
-            String message = "paint wall";
-            try {
-                producer.sendMessage(message);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-        });
-
-        ButtonGroup group = new ButtonGroup();
-        group.add(clear);
-        group.add(wall);
-
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.add(clear);
-        panel.add(wall);
-
-        return panel;
     }
 
     /**
@@ -137,20 +86,8 @@ public class Menu extends JPanel {
         JLabel l1 = new JLabel("Source: (");
         JLabel l2 = new JLabel(",");
         JLabel l3 = new JLabel(")");
-        JTextField xField = makeIntTextField(0, 98, 2, 0);
-        JTextField yField = makeIntTextField(0, 98, 2, 0);
-
-        JButton button = new JButton("Set Source");
-        button.addActionListener(event -> {
-            String message = String.format("source %s %s", xField.getText().isEmpty() ? "0" : xField.getText(),
-                    yField.getText().isEmpty() ? "0" : yField.getText());
-            try {
-                producer.sendMessage(message);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-        });
+        JTextField xField = makeIntegerField(0, 99, 19, 2, "source col");
+        JTextField yField = makeIntegerField(0, 99, 19, 2, "source row");
 
         JPanel panel = new JPanel();
         panel.add(l1);
@@ -158,7 +95,6 @@ public class Menu extends JPanel {
         panel.add(l2);
         panel.add(yField);
         panel.add(l3);
-        panel.add(button);
 
         return panel;
     }
@@ -172,20 +108,8 @@ public class Menu extends JPanel {
         JLabel l1 = new JLabel("Destination: (");
         JLabel l2 = new JLabel(",");
         JLabel l3 = new JLabel(")");
-        JTextField xField = makeIntTextField(0, 99, 2, 19);
-        JTextField yField = makeIntTextField(0, 99, 2, 19);
-
-        JButton button = new JButton("Set Destination");
-        button.addActionListener(event -> {
-            String message = String.format("destination %s %s", xField.getText().isEmpty() ? "0" : xField.getText(),
-                    yField.getText().isEmpty() ? "0" : yField.getText());
-            try {
-                producer.sendMessage(message);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-        });
+        JTextField xField = makeIntegerField(0, 99, 19, 2, "destination col");
+        JTextField yField = makeIntegerField(0, 99, 19, 2, "destination row");
 
         JPanel panel = new JPanel();
         panel.add(l1);
@@ -193,28 +117,8 @@ public class Menu extends JPanel {
         panel.add(l2);
         panel.add(yField);
         panel.add(l3);
-        panel.add(button);
 
         return panel;
-    }
-
-    /**
-     * Makes JTextField that accepts integers between {@code min} and {@code max} (inclusive),
-     * with {@code cols} number of columns, and a default value of {@code def}.
-     * 
-     * @param min minimum accepted value of this text field
-     * @param max maximum accepted value of this text field
-     * @param cols number of columns this text field has 
-     * @param def this text field's default value
-     * @return JTextField that only accepts integers between {@code min} and {@code max}.
-     */
-    private JTextField makeIntTextField(int min, int max, int cols, int def) {
-        JTextField textField = new JTextField(cols);
-        PlainDocument doc = (PlainDocument) textField.getDocument();
-        doc.setDocumentFilter(new IntFilter(min, max));
-        textField.setText(Integer.toString(def));
-        textField.setEditable(true);
-        return textField;
     }
 
     /**
@@ -305,7 +209,7 @@ public class Menu extends JPanel {
      * @return JPanel that gets rid of walls and coloring done by a pathfinding algorithm.
      */
     private JPanel eraseButton() {
-        JButton button = new JButton("Erase Walls");
+        JButton button = new JButton("Erase Everything");
         button.addActionListener(
             event -> {
                 String message = "erase";
@@ -323,6 +227,12 @@ public class Menu extends JPanel {
         return panel;
     }
 
+    /**
+     * Creates JPanel with a single button. This turns the associated TileGrid into a
+     * randomly generated maze.
+     * 
+     * @return JPanel that creates mazes when clicked
+     */
     private JPanel mazeButton() {
         JButton button = new JButton ("Make Maze");
         button.addActionListener(
@@ -340,5 +250,37 @@ public class Menu extends JPanel {
         JPanel panel = new JPanel();
         panel.add(button);
         return panel;
+    }
+
+    /**
+     * Creates a JTextField that attempts to send a message via {@code producer} when enter is pressed.
+     * The message is only sent if this text field's text evaluates to an integer between {@code min} and {@code max}.
+     * 
+     * @param min smallest allowable integer value
+     * @param max largest allowable integer value
+     * @param defaultValue value thios text field starts with
+     * @param columns number of columns this text field has
+     * @param command String prepended to this text field's value when a message is sent to the associated TileGrid
+     * @return JTextField that checks if it's value is an integer between {@code min} and {@code max} before sending a message to a TileGrid
+     */
+    private JTextField makeIntegerField(int min, int max, int defaultValue, int columns, String command) {
+        JTextField tf = new JTextField(Integer.toString(defaultValue), columns);
+        tf.addActionListener(
+            event -> {
+                String s = tf.getText().trim();
+                if (s.matches("-?\\d+")) { // s is an integer
+                    int x = Integer.parseInt(s);
+                    if (x > min && x <= max) {
+                            try {
+                                producer.sendMessage(String.format("%s %d", command, x));
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                                System.exit(1);
+                            }
+                        }
+                    }
+            }
+        );
+        return tf;
     }
 }

@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.event.InputEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +31,6 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * How many tiles tall the grid is, or number of tiles along the y-axis.
      */
     private int numCols;
-    /**
-     * The paint a user uses when dragging their mouse across the grid.
-     */
-    private Color paintColor = Pallete.WALL;
     /**
      * The undlerlying logical graph used for pathfinding.
      */
@@ -149,23 +146,23 @@ public class TileGrid extends JPanel implements MouseInputListener {
         int x = sourceCoord.first;
         int y = sourceCoord.second;
         if (x < 0 || x >= numRows || y < 0 || y >= numCols) {
-            changeSource(0, 0);
-        } else {
-            changeSource(x, y);
+            sourceCoord = new Pair<>(0, 0);
         }
+        forcePaintTile(sourceCoord.first, sourceCoord.second, Pallete.SOURCE);
 
         x = destCoord.first;
         y = destCoord.second;
         if (x < 0 || x >= numRows || y < 0 || y >= numCols) {
-            changeDest(numRows - 1, numCols - 1);
-        } else {
-            changeDest(x, y);
+            destCoord = new Pair<>(numRows - 1, numCols - 1);
         }
+        forcePaintTile(destCoord.first, destCoord.second, Pallete.DEST);
 
         if (sourceCoord.equals(destCoord) && sourceCoord.equals(new Pair<>(0, 0))) {
             changeDest(1, 1);
+            forcePaintTile(sourceCoord.first, sourceCoord.second, Pallete.SOURCE);
         } else if (sourceCoord.equals(destCoord)) {
             changeDest(0, 0);
+            forcePaintTile(sourceCoord.first, sourceCoord.second, Pallete.SOURCE);
         }
 
         this.revalidate();
@@ -200,7 +197,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * <p>
      * Valid commands are:
      * <ul>
-     * <li>"resize width height" - resizes the grid
+     * <li>"resize (row|col) x" - resizes the grid
      * <li>"paint color" - changes the color you paint with
      * <li>"source row col" - changes the location of the source tile
      * <li>"destination row col" - changes the location of the destination tile
@@ -219,29 +216,30 @@ public class TileGrid extends JPanel implements MouseInputListener {
         String command = args[0];
         switch (command) {
             case "resize":
-                int width = Integer.parseInt(args[1]);
-                int height = Integer.parseInt(args[2]);
-                resizeGrid(height, width);
-                break;
-
-            case "paint":
-                if (args[1].equals("clear")) {
-                    paintColor = Pallete.CLEAR;
+                int x = Integer.parseInt(args[2]);
+                if (args[1].equals("row")) {
+                    resizeGrid(x, numCols);
                 } else {
-                    paintColor = Pallete.WALL;
+                    resizeGrid(numRows, x);
                 }
                 break;
 
             case "source":
-                int row = Integer.parseInt(args[2]);
-                int col = Integer.parseInt(args[1]);
-                changeSource(row, col);
+            x = Integer.parseInt(args[2]);
+            if (args[1].equals("row")) {
+                changeSource(x, sourceCoord.second);
+            } else {
+                changeSource(sourceCoord.first, x);
+            }
                 break;
 
             case "destination":
-                row = Integer.parseInt(args[2]);
-                col = Integer.parseInt(args[1]);
-                changeDest(row, col);
+                x = Integer.parseInt(args[2]);
+                if (args[1].equals("row")) {
+                    changeDest(x, destCoord.second);
+                } else {
+                    changeDest(destCoord.first, x);
+                }
                 break;
 
             case "diagonal":
@@ -408,6 +406,8 @@ public class TileGrid extends JPanel implements MouseInputListener {
 
     @Override
     public void mouseDragged(MouseEvent event) {
+
+        //determine which tile mouse is over
         //adjust for fact tiles aren't flush with window borders
         JPanel tile = tiles.get(0).get(0);
         int x = event.getX() - tile.getX();
@@ -416,23 +416,16 @@ public class TileGrid extends JPanel implements MouseInputListener {
         //limit get row and column indices based off pixel x and y values
         int row = y / tile.getHeight();
         int col = x / tile.getWidth();
-        paintTile(row, col);
-    }
 
-    /**
-     * Attempts to paint the tile located at the coordinate {@code (row, col)}. 
-     * Will not paint over tiles located at {@link #sourceCoord} or {@link #destCoord}.
-     * This function will also not paint tiles that are outside the bounds of the grid.
-     * <p>
-     * Also modified properties of underlying graph depending on what color is painted. 
-     * For example, if you paint a tile as a wall, then the corresponding node will be marked 
-     * as unreachable.
-     * 
-     * @param row row on which tile to paint is located
-     * @param col column on which tile to paint is located
-     */
-    private void paintTile(int row, int col) {
-        paintTile(row, col, paintColor);
+        //determine which button was pressed
+        int buttonPressed = event.getModifiersEx();
+        if (buttonPressed == InputEvent.BUTTON1_DOWN_MASK) {
+            //left mouse button pressed down
+            paintTile(row, col, Pallete.WALL);
+        } else if (buttonPressed == InputEvent.BUTTON3_DOWN_MASK) {
+            //right mouse button pressed down
+            paintTile(row, col, Pallete.CLEAR);
+        }
     }
 
     /**
@@ -457,7 +450,22 @@ public class TileGrid extends JPanel implements MouseInputListener {
             return;
         }
 
+        forcePaintTile(row, col, color);
+    }
 
+    /**
+     * Paints the tile at coordinate {@code (row, col)}. 
+     * Does no bounds checking or checking of any kind
+     * <p>
+     * Also modified properties of underlying graph depending on what color is painted. 
+     * For example, if you paint a tile as a wall, then the corresponding node will be marked 
+     * as unreachable.
+     * 
+     * @param row row on which tile to paint is located
+     * @param col column on which tile to paint is located
+     * @param color Color with which you want to paint the tile
+     */
+    private void forcePaintTile(int row, int col, Color color) {
         graph.setNodeReachability(row, col, color != Pallete.WALL);
         tiles.get(row).get(col).setBackground(color);
     }
@@ -495,9 +503,10 @@ public class TileGrid extends JPanel implements MouseInputListener {
     /**
      * Changes where the destination tile is.
      * 
-     * @see #changeSource
      * @param row row of new destination tile location
      * @param col column of new destination tile location
+     * 
+     * @see #changeSource
      */
     private void changeDest(int row, int col) {
         if (row < 0 || row >= numRows || col < 0 || col >= numCols) {

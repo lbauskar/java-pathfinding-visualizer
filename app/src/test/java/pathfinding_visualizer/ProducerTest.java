@@ -63,7 +63,7 @@ public class ProducerTest {
 
     @Test
     public void interruptTest() throws InterruptedException {
-        Producer p = new Producer();
+        final Producer p = new Producer();
 
         Thread t = new Thread(new Runnable() {
             public void run() {
@@ -84,5 +84,33 @@ public class ProducerTest {
         t.interrupt();
         String message = p.getMessage();
         assertEquals("interrupted", message);
+
+        
+        while (p.size() < Producer.MAX_QUEUE_SIZE) {
+            p.sendMessage("blah");
+        }
+
+        t = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    p.sendMessage("blah");
+                } catch (InterruptedException e) {
+                    try {
+                        while (p.size() > 0) {
+                            p.getMessage();
+                        }
+						p.sendMessage("interrupted");
+					} catch (InterruptedException e1) {
+						Thread.currentThread().interrupt();
+					}
+                }
+            }
+        });
+        t.start();
+
+        Thread.sleep(50);
+        t.interrupt();
+        Thread.sleep(25);
+        assertEquals("interrupted", p.getMessage());
     }
 }
