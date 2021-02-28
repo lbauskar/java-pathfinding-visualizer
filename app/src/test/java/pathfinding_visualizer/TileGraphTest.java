@@ -20,9 +20,7 @@ public class TileGraphTest {
         out.write(g.toString());
         out.close();
 
-        boolean matches = fileEquality("out.txt", "5x5_output.txt");
-        assertTrue("Output does not match expect result", matches);
-        new File("out.txt").delete();
+        fileEquality("out.txt", "5x5_output.txt");
     }
 
     @Test 
@@ -37,7 +35,7 @@ public class TileGraphTest {
         out.write(g.toString());
         out.close();
 
-        assertTrue("Output does not match expect result", fileEquality("out.txt", "4x4diag_output.txt"));
+        fileEquality("out.txt", "4x4diag_output.txt");
 
     }
 
@@ -65,7 +63,7 @@ public class TileGraphTest {
         out.write(g.toString());
         out.close();
 
-        assertTrue("Output does not match expect result", fileEquality("out.txt", "5x5rem_output.txt"));
+        fileEquality("out.txt", "5x5rem_output.txt");
     }
 
     @Test
@@ -94,10 +92,10 @@ public class TileGraphTest {
         out.write(g.toString());
         out.close();
 
-        assertTrue("Output does not match expect result", fileEquality("out.txt", "5x5rem_output.txt"));
+        fileEquality("out.txt", "5x5rem_output.txt");
     }
 
-    private boolean fileEquality(String file1, String file2) throws IOException {
+    private void fileEquality(String file1, String file2) throws IOException {
         BufferedReader in1 = new BufferedReader(new FileReader(outDir + file1));
         BufferedReader in2 = new BufferedReader(new FileReader(resDir + file2));
         
@@ -115,7 +113,7 @@ public class TileGraphTest {
         in2.close();
 
 
-        return sb2.toString().equals(sb1.toString());
+        assertEquals(sb2.toString(), sb1.toString());
     }
     
 }

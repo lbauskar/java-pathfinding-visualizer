@@ -46,19 +46,19 @@ public class AlgorithmsTest {
         String bfsGrid = Algorithms.bfs(source, dest, noWalls).toString();
         out.write(bfsGrid);
         out.close();
-        assertTrue(fileEquality("out.txt", "bfs_grid.txt"));
+        fileEquality("out.txt", "bfs_grid.txt");
 
         out = new FileWriter(outDir + "out.txt");
         String bfsDiag = Algorithms.bfs(source, dest, noWallsDiag).toString();
         out.write(bfsDiag);
         out.close();
-        assertTrue(fileEquality("out.txt", "bfs_diag.txt"));
+        fileEquality("out.txt", "bfs_diag.txt");
 
         out = new FileWriter(outDir + "out.txt");
         String bfsImp = Algorithms.bfs(source, dest, impossible).toString();
         out.write(bfsImp);
         out.close();
-        assertTrue(fileEquality("out.txt", "bfs_imp.txt"));
+        fileEquality("out.txt", "bfs_imp.txt");
     }
 
     /**
@@ -74,19 +74,19 @@ public class AlgorithmsTest {
         String djikstraGrid = Algorithms.djikstra(source, dest, noWalls).toString();
         out.write(djikstraGrid);
         out.close();
-        assertTrue(fileEquality("out.txt", "djikstra_grid.txt"));
+        fileEquality("out.txt", "djikstra_grid.txt");
 
         out = new FileWriter(outDir + "out.txt");
         String djikstraDiag = Algorithms.djikstra(source, dest, noWallsDiag).toString();
         out.write(djikstraDiag);
         out.close();
-        assertTrue(fileEquality("out.txt", "djikstra_diag.txt"));
+        fileEquality("out.txt", "djikstra_diag.txt");
 
         out = new FileWriter(outDir + "out.txt");
         String djikstraImp = Algorithms.djikstra(source, dest, impossible).toString();
         out.write(djikstraImp);
         out.close();
-        assertTrue(fileEquality("out.txt", "djikstra_imp.txt"));
+        fileEquality("out.txt", "djikstra_imp.txt");
     }
 
     /**
@@ -102,19 +102,19 @@ public class AlgorithmsTest {
         String aStarGrid = Algorithms.aStar(source, dest, noWalls).toString();
         out.write(aStarGrid);
         out.close();
-        assertTrue(fileEquality("out.txt", "astar_grid.txt"));
+        fileEquality("out.txt", "astar_grid.txt");
 
         out = new FileWriter(outDir + "out.txt");
         String aStarDiag = Algorithms.aStar(source, dest, noWallsDiag).toString();
         out.write(aStarDiag);
         out.close();
-        assertTrue(fileEquality("out.txt", "astar_diag.txt"));
+        fileEquality("out.txt", "astar_diag.txt");
 
         out = new FileWriter(outDir + "out.txt");
         String aStarImp = Algorithms.aStar(source, dest, impossible).toString();
         out.write(aStarImp);
         out.close();
-        assertTrue(fileEquality("out.txt", "astar_imp.txt"));
+        fileEquality("out.txt", "astar_imp.txt");
     }
 
     /**
@@ -136,7 +136,7 @@ public class AlgorithmsTest {
         String s = Algorithms.makeMaze(source, dest, g, random).toString();
         out.write(s);
         out.close();
-        assertTrue(fileEquality("out.txt", "10x10_maze.txt"));
+        fileEquality("out.txt", "10x10_maze.txt");
 
         g = new TileGraph(10, 10, false);
         random = new Random(2021);
@@ -144,7 +144,7 @@ public class AlgorithmsTest {
         s = Algorithms.makeMaze(dest, source, g, random).toString();
         out.write(s);
         out.close();
-        assertTrue(fileEquality("out.txt", "10x10_maze2.txt"));
+        fileEquality("out.txt", "10x10_maze2.txt");
 
 
         g = new TileGraph(10, 10, false);
@@ -154,10 +154,10 @@ public class AlgorithmsTest {
         s = Algorithms.makeMaze(source2, dest, g, random).toString();
         out.write(s);
         out.close();
-        assertTrue(fileEquality("out.txt", "10x10_maze3.txt"));
+        fileEquality("out.txt", "10x10_maze3.txt");
     }
 
-    private boolean fileEquality(String file1, String file2) throws IOException {
+    private void fileEquality(String file1, String file2) throws IOException {
         BufferedReader in1 = new BufferedReader(new FileReader(outDir + file1));
         BufferedReader in2 = new BufferedReader(new FileReader(resDir + file2));
         
@@ -175,6 +175,6 @@ public class AlgorithmsTest {
         in2.close();
 
 
-        return sb2.toString().equals(sb1.toString());
+        assertEquals(sb2.toString(), sb1.toString());
     }
 }

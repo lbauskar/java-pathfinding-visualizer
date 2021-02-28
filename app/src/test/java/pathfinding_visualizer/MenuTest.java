@@ -81,7 +81,7 @@ public class MenuTest {
 
         int i = Math.abs((int) System.currentTimeMillis()) % box.getItemCount();
         box.setSelectedIndex(i);
-        String expected = "search " + box.getSelectedItem();
+        String expected = String.format("search %s 100", box.getSelectedItem());
 
         ActionListener listener = button.getActionListeners()[0];
         ActionEvent event = new ActionEvent(button, ActionEvent.ACTION_PERFORMED, null);
@@ -102,7 +102,14 @@ public class MenuTest {
 
     @Test
     public void testMazeButton() throws InterruptedException {
-        testButtonPanel(maze, "maze");
+        JButton button = (JButton) maze.getComponent(0);
+        ActionListener listener = button.getActionListeners()[0];
+        ActionEvent event = new ActionEvent(button, ActionEvent.ACTION_PERFORMED, null);
+        listener.actionPerformed(event);
+        long time = System.currentTimeMillis();
+        String[] args = sq.getMessage().split(" ");
+        assertEquals("maze", args[0]);
+        assertTrue(Math.abs(time - Long.parseLong(args[1])) < 5);
     }
 
     private void testButtonPanel(JPanel panel, String expected) throws InterruptedException {

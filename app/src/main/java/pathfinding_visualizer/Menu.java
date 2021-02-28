@@ -156,7 +156,7 @@ public class Menu extends JPanel {
         JButton button = new JButton("Start");
         button.addActionListener(
             event -> {
-                String message = String.format("search %s", box.getSelectedItem());
+                String message = String.format("search %s 100", box.getSelectedItem());
                 syncQueue.sendMessage(message);
             }
         );
@@ -217,7 +217,7 @@ public class Menu extends JPanel {
         JButton button = new JButton ("Make Maze");
         button.addActionListener(
             event -> {
-                String message = "maze";
+                String message = "maze " + System.currentTimeMillis();
                 syncQueue.sendMessage(message);
             }
         );

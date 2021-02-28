@@ -7,7 +7,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.InputEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -79,20 +81,20 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * If either {@code width} or {@code height} is less than 4 or greater than 99,
      * the default values of {@code width = 4} and {@code height = 4} will be used.
      * 
-     * @param width  number of tiles this grid should have along the x-axis
-     * @param height number of tiles this grid should have along the y-axis
+     * @param cols  number of tiles this grid should have along the x-axis
+     * @param rows number of tiles this grid should have along the y-axis
      * @param syncQueue Producer you want this TileGrid to listen to
      */
-    public TileGrid(int width, int height, SynchronizedQueue syncQueue) {
+    public TileGrid(int rows, int cols, SynchronizedQueue syncQueue) {
         this.addMouseMotionListener(this);
         this.setBackground(Pallete.WALL);
 
-        if (width < 4 || width > 99 || height < 4 || height > 99) {
-            width = 4;
-            height = 4;
+        if (cols < 4 || cols > 99 || rows < 4 || rows > 99) {
+            cols = 4;
+            rows = 4;
         }
 
-        resizeGrid(height, width);
+        resizeGrid(rows, cols);
         changeSource(0, 0);
         changeDest(numRows - 1, numCols - 1);
 
@@ -146,24 +148,19 @@ public class TileGrid extends JPanel implements MouseInputListener {
         int x = sourceCoord.first;
         int y = sourceCoord.second;
         if (x < 0 || x >= numRows || y < 0 || y >= numCols) {
-            sourceCoord = new Pair<>(0, 0);
+            Pair<Integer, Integer> temp = new Pair<>(0, 0);
+            sourceCoord = (destCoord == temp) ? new Pair<>(numRows - 1, numCols - 1) : temp;
         }
         forcePaintTile(sourceCoord.first, sourceCoord.second, Pallete.SOURCE);
 
         x = destCoord.first;
         y = destCoord.second;
         if (x < 0 || x >= numRows || y < 0 || y >= numCols) {
-            destCoord = new Pair<>(numRows - 1, numCols - 1);
+            Pair<Integer, Integer> temp = new Pair<>(numRows - 1, numCols - 1);
+            destCoord = (sourceCoord == temp) ? new Pair<>(0, 0) : temp;
         }
         forcePaintTile(destCoord.first, destCoord.second, Pallete.DEST);
 
-        if (sourceCoord.equals(destCoord) && sourceCoord.equals(new Pair<>(0, 0))) {
-            changeDest(1, 1);
-            forcePaintTile(sourceCoord.first, sourceCoord.second, Pallete.SOURCE);
-        } else if (sourceCoord.equals(destCoord)) {
-            changeDest(0, 0);
-            forcePaintTile(sourceCoord.first, sourceCoord.second, Pallete.SOURCE);
-        }
 
         this.revalidate();
     }
@@ -249,7 +246,8 @@ public class TileGrid extends JPanel implements MouseInputListener {
 
             case "search":
                 clearGrid();
-                chooseAlgorithm(args[1]);
+                int step = Integer.parseInt(args[2]);
+                chooseAlgorithm(args[1], step);
                 break;
 
             case "clear":
@@ -261,7 +259,8 @@ public class TileGrid extends JPanel implements MouseInputListener {
                 break;
 
             case "maze":
-                makeMaze();
+                long seed = Long.parseLong(args[1]);
+                makeMaze(seed);
                 break;
 
 
@@ -277,10 +276,10 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * The maze creation is done in a TileGraph, then whatever tiles that are marked as walls
      * become painted as such.
      */
-    private void makeMaze() {
+    private void makeMaze(long seed) {
         resizeGrid(numRows, numCols);
         Set<Pair<Integer, Integer>> walls = 
-            Algorithms.makeMaze(sourceCoord, destCoord, graph, new Random(System.currentTimeMillis()));
+            Algorithms.makeMaze(sourceCoord, destCoord, graph, new Random(seed));
 
         for (Pair<Integer, Integer> p : walls) {
             paintTile(p.first, p.second, Pallete.WALL);
@@ -293,8 +292,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * 
      * @param algorithm String representation of algorithm you want visualized
      */
-    private void chooseAlgorithm(String algorithm) {
-        int stepLengthMillis = 100;
+    private void chooseAlgorithm(String algorithm, int stepLengthMillis) {
         switch (algorithm) {
             case "BFS":
                 visualizeAlgorithm(Algorithms.bfs(sourceCoord, destCoord, graph), stepLengthMillis);
@@ -527,11 +525,28 @@ public class TileGrid extends JPanel implements MouseInputListener {
     }
 
     /**
-     * Returns {@code graph.toString()}. Used to check status of underlying TileGraph.
+     * TODO
      * 
-     * @return String representation of this TileGrid's {@code graph} field.
+     * @return String representation of this TileGrid
      */
-    public String graphString() {
-        return graph.toString();
+    @Override
+    public String toString() {
+        final Map<Color, Character> colorToChar = new HashMap<>(); 
+        colorToChar.put(Pallete.CLEAR, 'c');
+        colorToChar.put(Pallete.WALL, 'w');
+        colorToChar.put(Pallete.SOURCE, 's');
+        colorToChar.put(Pallete.DEST, 'd');
+        colorToChar.put(Pallete.VISIT, 'v');
+        colorToChar.put(Pallete.PATH, 'p');
+
+        StringBuilder sb = new StringBuilder();
+        for (List<JPanel> row : tiles) {
+            for (JPanel tile : row) {
+                sb.append(colorToChar.get(tile.getBackground()));
+            }
+            sb.append(" \n");
+        }
+
+        return sb.toString();
     }
 }
