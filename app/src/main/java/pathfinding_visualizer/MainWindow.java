@@ -26,9 +26,9 @@ public class MainWindow extends JFrame {
         pane.setPreferredSize(new Dimension(width, height)); // set window size in pixels
 
         // create subpanels
-        Producer producer = new Producer();
-        JPanel menu = new Menu(producer);
-        TileGrid grid = new TileGrid(20, 20, producer);
+        SynchronizedQueue syncQueue = new SynchronizedQueue();
+        JPanel menu = new Menu(syncQueue);
+        TileGrid grid = new TileGrid(20, 20, syncQueue);
 
         // Create layout with 2 panels side by side
         pane.setLayout(new GridBagLayout());

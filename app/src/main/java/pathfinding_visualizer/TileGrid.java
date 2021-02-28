@@ -81,9 +81,9 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * 
      * @param width  number of tiles this grid should have along the x-axis
      * @param height number of tiles this grid should have along the y-axis
-     * @param producer Producer you want this TileGrid to listen to
+     * @param syncQueue Producer you want this TileGrid to listen to
      */
-    public TileGrid(int width, int height, Producer producer) {
+    public TileGrid(int width, int height, SynchronizedQueue syncQueue) {
         this.addMouseMotionListener(this);
         this.setBackground(Pallete.WALL);
 
@@ -96,7 +96,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
         changeSource(0, 0);
         changeDest(numRows - 1, numCols - 1);
 
-        new Consumer(producer) {
+        new Consumer(syncQueue) {
 			@Override
 			public void run() {
                 while (true) {
@@ -524,5 +524,14 @@ public class TileGrid extends JPanel implements MouseInputListener {
             tiles.get(row).get(col).setBackground(Pallete.DEST);
             destCoord = coord;
         }
+    }
+
+    /**
+     * Returns {@code graph.toString()}. Used to check status of underlying TileGraph.
+     * 
+     * @return String representation of this TileGrid's {@code graph} field.
+     */
+    public String graphString() {
+        return graph.toString();
     }
 }

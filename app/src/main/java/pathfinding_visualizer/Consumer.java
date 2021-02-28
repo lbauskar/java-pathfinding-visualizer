@@ -1,18 +1,18 @@
 package pathfinding_visualizer;
 
 /**
- * Retrieves String messages from a {@link Producer}.
+ * Retrieves String messages from a {@link SynchronizedQueue}.
  */
 public abstract class Consumer extends Thread {
-    private Producer producer;
+    private SynchronizedQueue syncQueue;
 
     /**
      * Creates a Consumer that listens to the {@code producer}.
      * 
-     * @param producer Producer this Consumer is listening to
+     * @param syncQueue Producer this Consumer is listening to
      */
-    protected Consumer(Producer producer) {
-        this.producer = producer;
+    protected Consumer(SynchronizedQueue syncQueue) {
+        this.syncQueue = syncQueue;
         this.start();
     }
 
@@ -23,7 +23,7 @@ public abstract class Consumer extends Thread {
      * @throws InterruptedException waited too long on an empty message queue
      */
     protected String getMessage() throws InterruptedException {
-        return producer.getMessage();
+        return syncQueue.getMessage();
     }
 
     /**

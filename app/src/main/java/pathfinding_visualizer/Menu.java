@@ -12,16 +12,16 @@ public class Menu extends JPanel {
     /**
      * Producer this Menu sends messages to
      */
-    private Producer producer;
+    private SynchronizedQueue syncQueue;
 
     /**
      * Creates a Menu that sends messages using the {@code producer}. The
      * {@link TileGrid} you want to modify use the same {@code producer} in its
      * constructor.
      * 
-     * @param producer Producer you want this Menu to send messages with
+     * @param syncQueue Producer you want this Menu to send messages with
      */
-    public Menu(Producer producer) {
+    public Menu(SynchronizedQueue syncQueue) {
         
         //Use system theme for the menu
         try {
@@ -31,7 +31,7 @@ public class Menu extends JPanel {
             // Do nothing. Use default look and feel.
         }
         
-        this.producer = producer;
+        this.syncQueue = syncQueue;
 
         Color bg = Color.gray;
         this.setBackground(bg);
@@ -134,12 +134,7 @@ public class Menu extends JPanel {
         checkBox.addActionListener(
             event -> {
                 String message = String.format("diagonal %b", checkBox.isSelected());
-                try {
-                    producer.sendMessage(message);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    System.exit(1);
-                }
+                syncQueue.sendMessage(message);
             }
         );
 
@@ -162,12 +157,7 @@ public class Menu extends JPanel {
         button.addActionListener(
             event -> {
                 String message = String.format("search %s", box.getSelectedItem());
-                try {
-                    producer.sendMessage(message);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    System.exit(1);
-                }
+                syncQueue.sendMessage(message);
             }
         );
 
@@ -188,12 +178,7 @@ public class Menu extends JPanel {
         button.addActionListener(
             event -> {
                 String message = "clear";
-                try {
-                    producer.sendMessage(message);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    System.exit(1);
-                }
+                syncQueue.sendMessage(message);
             }
         );
 
@@ -213,12 +198,7 @@ public class Menu extends JPanel {
         button.addActionListener(
             event -> {
                 String message = "erase";
-                try {
-                    producer.sendMessage(message);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    System.exit(1);
-                }
+                syncQueue.sendMessage(message);
             }
         );
 
@@ -238,12 +218,7 @@ public class Menu extends JPanel {
         button.addActionListener(
             event -> {
                 String message = "maze";
-                try {
-                    producer.sendMessage(message);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    System.exit(1);
-                }
+                syncQueue.sendMessage(message);
             }
         );
 
@@ -271,14 +246,9 @@ public class Menu extends JPanel {
                 if (s.matches("-?\\d+")) { // s is an integer
                     int x = Integer.parseInt(s);
                     if (x > min && x <= max) {
-                            try {
-                                producer.sendMessage(String.format("%s %d", command, x));
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                                System.exit(1);
-                            }
-                        }
+                            syncQueue.sendMessage(String.format("%s %d", command, x));
                     }
+                }
             }
         );
         return tf;

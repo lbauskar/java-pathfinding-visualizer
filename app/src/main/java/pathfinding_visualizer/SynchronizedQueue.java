@@ -7,14 +7,8 @@ import java.util.Queue;
 /**
  * Sends String messages to a {@link Consumer}.
  */
-public class Producer implements Serializable {
+public class SynchronizedQueue implements Serializable {
     private static final long serialVersionUID = -5768889538764837228L;
-    /**
-     * Limit to how large {@code messageQueue} can be. Attempts to add
-     * messages to the messageQueue when it reaches this size will stall
-     * until messageQueue has shrunk.
-     */
-    public static final int MAX_QUEUE_SIZE = 10;
     /**
      * Queue of Strings to be sent to a Consumer. 
      */
@@ -26,16 +20,18 @@ public class Producer implements Serializable {
      * @throws InterruptedException if the function waits too long
      */
     public synchronized String getMessage() throws InterruptedException {
-        notifyAll();
         while (messageQueue.isEmpty()) {
             wait();
         }
-
         return messageQueue.remove();
     }
 
     public synchronized int size() {
         return messageQueue.size();
+    }
+
+    public synchronized boolean isEmpty() {
+        return messageQueue.isEmpty();
     }
 
     /**
@@ -46,11 +42,7 @@ public class Producer implements Serializable {
      * @param message String to add to {@code messageQueue}
      * @throws InterruptedException the function waited too long and got interrupted
      */
-    public synchronized void sendMessage(String message) throws InterruptedException {
-        while (messageQueue.size() >= MAX_QUEUE_SIZE) {
-            wait();
-        }
-
+    public synchronized void sendMessage(String message) {
         messageQueue.add(message);
         notifyAll();
     }
