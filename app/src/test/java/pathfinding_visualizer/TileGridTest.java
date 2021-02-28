@@ -81,19 +81,19 @@ public class TileGridTest {
         writeToOut(tg.toString());
         outTxtEquals("10x10.txt");
 
-        sq.sendMessage("search Djikstra 1");
+        sq.sendMessage("search Djikstra 0");
         Thread.sleep(100);
         writeToOut(tg.toString());
         outTxtEquals("djikstra.txt");
 
         sq.sendMessage("diagonal true");
         Thread.sleep(50);
-        sq.sendMessage("search BFS 1");
+        sq.sendMessage("search BFS 0");
         Thread.sleep(100);
         writeToOut(tg.toString());
 
         sq.sendMessage("diagonal false");
-        sq.sendMessage("search A* 1");
+        sq.sendMessage("search A* 0");
         Thread.sleep(100);
         writeToOut(tg.toString());
         outTxtEquals("astar.txt");
@@ -121,6 +121,11 @@ public class TileGridTest {
         Thread.sleep(50);
         writeToOut(tg.toString());
         outTxtEquals("20x20.txt");
+    }
+
+    @Test
+    public void testChangingSourceAndDest() throws IOException, InterruptedException {
+
     }
 
     private void writeToOut(String s) throws IOException {

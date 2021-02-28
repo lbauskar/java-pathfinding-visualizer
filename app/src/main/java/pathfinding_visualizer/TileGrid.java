@@ -17,7 +17,6 @@ import java.util.Set;
  * Rectangular, gridded tilemap used for pathfinding visualization.
  */
 public class TileGrid extends JPanel implements MouseInputListener {
-    private static final long serialVersionUID = 2988009908866290833L; // auto-generated
 
     /**
      * A 2D array of JPanels that keeps track of the tiles in the grid. This array
@@ -46,15 +45,16 @@ public class TileGrid extends JPanel implements MouseInputListener {
      */
     private Pair<Integer, Integer> destCoord = new Pair<>(19, 19);
     /**
-     * Whether {@link #graph} should connect nodes that are touching
-     * diagonally.
+     * Whether {@link #graph} should connect nodes that are touching diagonally.
      */
     private boolean connectDiagonals = false;
 
+    private Thread algorithmDrawingThread = null;
+
     /**
      * A collection of colors labelled by what the tile is supposed to represent.
-     * For example, walls are black, so Pallete.WALL is the color black.
-     * The current labels are:
+     * For example, walls are black, so Pallete.WALL is the color black. The current
+     * labels are:
      * <ul>
      * <li>WALL - unvisitable wall tile
      * <li>CLEAR - tile that can be visited
@@ -81,8 +81,8 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * If either {@code width} or {@code height} is less than 4 or greater than 99,
      * the default values of {@code width = 4} and {@code height = 4} will be used.
      * 
-     * @param cols  number of tiles this grid should have along the x-axis
-     * @param rows number of tiles this grid should have along the y-axis
+     * @param cols      number of tiles this grid should have along the x-axis
+     * @param rows      number of tiles this grid should have along the y-axis
      * @param syncQueue Producer you want this TileGrid to listen to
      */
     public TileGrid(int rows, int cols, SynchronizedQueue syncQueue) {
@@ -99,8 +99,8 @@ public class TileGrid extends JPanel implements MouseInputListener {
         changeDest(numRows - 1, numCols - 1);
 
         new Consumer(syncQueue) {
-			@Override
-			public void run() {
+            @Override
+            public void run() {
                 while (true) {
                     try {
                         String message = this.getMessage();
@@ -110,7 +110,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
                         System.exit(1);
                     }
                 }
-			}
+            }
         };
     }
 
@@ -120,18 +120,19 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * measurements.
      * <p>
      * <ul>
-     * <li>This function will do nothing if either {@code rows} or {@code cols}
-     * is less than 4 or greater than 99.
+     * <li>This function will do nothing if either {@code rows} or {@code cols} is
+     * less than 4 or greater than 99.
      * <li>If the {@link #sourceCoord} or {@link #destCoord} fields of this TileGrid
      * fall outside the grid after resizing, their values will be changed to put
      * them back in the grid.
      * </ul>
      * <p>
      * 
-     * @param rows  number of tiles this resized grid should have along the y-axis
+     * @param rows number of tiles this resized grid should have along the y-axis
      * @param cols number of tiles this resized grid should have along the x-axis
      */
     private void resizeGrid(int rows, int cols) {
+        stopDrawingThread();
         if (rows < 4 || rows > 99 || cols < 4 || cols > 99) {
             return;
         }
@@ -161,7 +162,6 @@ public class TileGrid extends JPanel implements MouseInputListener {
         }
         forcePaintTile(destCoord.first, destCoord.second, Pallete.DEST);
 
-
         this.revalidate();
     }
 
@@ -172,7 +172,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * If tiles were already present, this function will destroy those tiles and
      * make new ones.
      * 
-     * @param rows  number of tiles the grid will have along the x-axis
+     * @param rows number of tiles the grid will have along the x-axis
      * @param cols number of tiles the grid will have along the y-axis
      */
     private void makeTiles(int rows, int cols) {
@@ -200,8 +200,10 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * <li>"destination row col" - changes the location of the destination tile
      * <li>"diagonal boolean" - sets whether tiles can be traversed diagonally
      * <li>"search algorithm" - visualizes a pathfinding algorithm
-     * <li>"clear" - sets every tile colored by an algorithm back to its original color
-     * <li>"erase" - resets every tile except the source and destination tile back to its original color
+     * <li>"clear" - sets every tile colored by an algorithm back to its original
+     * color
+     * <li>"erase" - resets every tile except the source and destination tile back
+     * to its original color
      * </ul>
      * 
      * @param message String sent to the parent Consumer
@@ -222,12 +224,12 @@ public class TileGrid extends JPanel implements MouseInputListener {
                 break;
 
             case "source":
-            x = Integer.parseInt(args[2]);
-            if (args[1].equals("row")) {
-                changeSource(x, sourceCoord.second);
-            } else {
-                changeSource(sourceCoord.first, x);
-            }
+                x = Integer.parseInt(args[2]);
+                if (args[1].equals("row")) {
+                    changeSource(x, sourceCoord.second);
+                } else {
+                    changeSource(sourceCoord.first, x);
+                }
                 break;
 
             case "destination":
@@ -263,7 +265,6 @@ public class TileGrid extends JPanel implements MouseInputListener {
                 makeMaze(seed);
                 break;
 
-
             default:
                 // System.out.println("Unknown message " + message);
                 break;
@@ -273,13 +274,12 @@ public class TileGrid extends JPanel implements MouseInputListener {
     /**
      * Creates a maze using a randomized DFS algorithm.
      * <p>
-     * The maze creation is done in a TileGraph, then whatever tiles that are marked as walls
-     * become painted as such.
+     * The maze creation is done in a TileGraph, then whatever tiles that are marked
+     * as walls become painted as such.
      */
     private void makeMaze(long seed) {
         resizeGrid(numRows, numCols);
-        Set<Pair<Integer, Integer>> walls = 
-            Algorithms.makeMaze(sourceCoord, destCoord, graph, new Random(seed));
+        Set<Pair<Integer, Integer>> walls = Algorithms.makeMaze(sourceCoord, destCoord, graph, new Random(seed));
 
         for (Pair<Integer, Integer> p : walls) {
             paintTile(p.first, p.second, Pallete.WALL);
@@ -313,6 +313,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * original "clear" color. Does not recolor source, destination, or wall tiles.
      */
     private void clearGrid() {
+        stopDrawingThread();
         for (List<JPanel> row : tiles) {
             for (JPanel tile : row) {
                 Color bg = tile.getBackground();
@@ -324,7 +325,8 @@ public class TileGrid extends JPanel implements MouseInputListener {
     }
 
     /**
-     * Animates the process and result of a pathfinding algorithm onto this TileGrid.
+     * Animates the process and result of a pathfinding algorithm onto this
+     * TileGrid.
      * <p>
      * The actions parameter can contain two types of strings:
      * <ol>
@@ -333,24 +335,31 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * tile part of the shortest path
      * </ol>
      * 
-     * @param actions List of Strings that tells the function what the pathfinding algorithm did for each iteration
+     * @param actions List of Strings that tells the function what the pathfinding
+     *                algorithm did for each iteration
      * 
      * @throws NumberFormatException     an invalid String is in {@code actions}
      * @throws IndexOutOfBoundsException an invalid String is in {@code actions}
      */
     private void visualizeAlgorithm(List<String> actions, int stepLengthMillis) {
-        Thread t = new Thread() { // Run this on a different thread
+        stopDrawingThread();
+        algorithmDrawingThread = new Thread() { // Run this on a different thread
             @Override
             public void run() {
                 // Actual logic of algorithm here
                 for (String action : actions) {
-                    while (System.currentTimeMillis() % stepLengthMillis != 0) {
+                    try {
+                        Thread.sleep(stepLengthMillis);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                    /*while (System.currentTimeMillis() % stepLengthMillis != 0) {
                         /*
                          * Use while loop instead of sleep() because sleep() can end up waiting more time
                          * than the specified milliseconds. This happens fairly often because the thread
                          * needs to get reactivated by the kernel.
-                         */
-                    }
+                         * /
+                    }*/
                     String[] args = action.split(" ");
                     if (args[0].equals("visit")) {
                         int x = Integer.parseInt(args[1]);
@@ -369,7 +378,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
                 }
             }
         };
-        t.start();
+        algorithmDrawingThread.start();
     }
 
     @Override
@@ -525,7 +534,18 @@ public class TileGrid extends JPanel implements MouseInputListener {
     }
 
     /**
-     * TODO
+     * Creates the String representation of this TileGrid by converting each tile into a character
+     * that represents its background color. For example, a 5x5 TileGrid with a source tile at (0, 0),
+     * a destination tile at (4, 4), and a wall down the middle would look like
+     * <p>
+     * scwcc <br/>
+     * ccwcc <br/>
+     * ccwcc <br/>
+     * ccwcc <br/>
+     * ccwcd <br/>
+     * <p>
+     * A space is appended to the end of each line to help Scanners differentiate between an AxB TileGrid
+     * and a BxA TileGrid.
      * 
      * @return String representation of this TileGrid
      */
@@ -548,5 +568,20 @@ public class TileGrid extends JPanel implements MouseInputListener {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * Halt the drawing thread if it is currently running. The intended effect of this
+     * function is to stop pathfinding visualization immediately.
+     */
+    private void stopDrawingThread() {
+        if (algorithmDrawingThread != null && algorithmDrawingThread.isAlive()) {
+            algorithmDrawingThread.interrupt();
+            try {
+                Thread.sleep(1); // let algorithmDrawingThread clean up
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 }

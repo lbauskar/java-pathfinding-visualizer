@@ -81,7 +81,7 @@ public class MenuTest {
 
         int i = Math.abs((int) System.currentTimeMillis()) % box.getItemCount();
         box.setSelectedIndex(i);
-        String expected = String.format("search %s 100", box.getSelectedItem());
+        String expected = String.format("search %s 5", box.getSelectedItem());
 
         ActionListener listener = button.getActionListeners()[0];
         ActionEvent event = new ActionEvent(button, ActionEvent.ACTION_PERFORMED, null);
