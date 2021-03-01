@@ -1,33 +1,33 @@
 package pathfinding_visualizer;
 
 /**
- * Retrieves String messages from a {@link SynchronizedQueue}.
+ * Listens to and retrieves objects from a {@link SynchronizedQueue}
  */
-public abstract class Consumer extends Thread {
-    private SynchronizedQueue syncQueue;
+public abstract class Consumer<T> extends Thread {
+    private SynchronizedQueue<T> syncQueue;
 
     /**
-     * Creates a Consumer that listens to the {@code producer}.
+     * Creates a Consumer that listens to {@code syncQueue}.
      * 
-     * @param syncQueue Producer this Consumer is listening to
+     * @param syncQueue SynchronizedQueue this Consumer is listening to
      */
-    protected Consumer(SynchronizedQueue syncQueue) {
+    protected Consumer(SynchronizedQueue<T> syncQueue) {
         this.syncQueue = syncQueue;
         this.start();
     }
 
     /**
-     * Retrieves a message from {@code producer}.
+     * Gets a message from internal SynchronizedQueue.
      * 
-     * @return String from {@code producer}'s message queue
-     * @throws InterruptedException waited too long on an empty message queue
+     * @return object at the front of the queue
+     * @throws InterruptedException waited too long on an empty queue
      */
-    protected String getMessage() throws InterruptedException {
-        return syncQueue.getMessage();
+    protected T getMessage() throws InterruptedException {
+        return syncQueue.get();
     }
 
     /**
-     * Implement run to listen to and parse messages sent by {@code producer}.
+     * Implement run to listen for and parse object retrieved with {@link #getMessage}.
      */
     @Override
     public abstract void run();

@@ -7,26 +7,26 @@ import org.junit.Test;
 public class SynchronizeQueueTest {
     @Test
     public void testSendMessage() throws InterruptedException {
-        SynchronizedQueue sq = new SynchronizedQueue();
+        SynchronizedQueue<String> sq = new SynchronizedQueue<>();
         assertTrue(sq.isEmpty());
         
         String expected = Long.toString(System.currentTimeMillis());
-        sq.sendMessage(expected);
+        sq.send(expected);
 
         assertEquals(1, sq.size());
-        assertEquals(expected, sq.getMessage());
+        assertEquals(expected, sq.get());
     }
 
     @Test
     public void testGetMessage() throws InterruptedException {
-        final SynchronizedQueue sq = new SynchronizedQueue();
+        final SynchronizedQueue<String> sq = new SynchronizedQueue<>();
 
         Thread t = new Thread(new Runnable() {
             public void run() {
                 try {
-                    sq.getMessage();
+                    sq.get();
                 } catch (InterruptedException e) {
-                    sq.sendMessage("interrupted");
+                    sq.send("interrupted");
                 }
             }
         });
@@ -34,6 +34,6 @@ public class SynchronizeQueueTest {
 
         Thread.sleep(50);
         t.interrupt();
-        assertEquals("interrupted", sq.getMessage());
+        assertEquals("interrupted", sq.get());
     }
 }

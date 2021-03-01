@@ -4,20 +4,18 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * Sends String messages to a {@link Consumer}.
+ * Thread-safe Queue
  */
-public class SynchronizedQueue {
-    /**
-     * Queue of Strings to be sent to a Consumer. 
-     */
-    private Queue<String> messageQueue = new LinkedList<>();
+public class SynchronizedQueue<T> {
+    private Queue<T> messageQueue = new LinkedList<>();
 
     /**
-     * Retrieves a message from {@code messageQueue}.
-     * @return the first String message in the message queue
-     * @throws InterruptedException if the function waits too long
+     * Gets an object from the front of the queue.
+     * 
+     * @return object at the front of this queue
+     * @throws InterruptedException waits too long on an empty queue
      */
-    public synchronized String getMessage() throws InterruptedException {
+    public synchronized T get() throws InterruptedException {
         while (messageQueue.isEmpty()) {
             wait();
         }
@@ -33,15 +31,12 @@ public class SynchronizedQueue {
     }
 
     /**
-     * Puts a String in {@code messageQueue}. 
-     * If {@code messageQueue} already contains {@value #MAX_QUEUE_SIZE} Strings, this
-     * function will wait for {@code messageQueue} to get smaller before adding {@code message}.
+     * Puts an object at the back of this queue.
      * 
-     * @param message String to add to {@code messageQueue}
-     * @throws InterruptedException the function waited too long and got interrupted
+     * @param obj object to add to the queue
      */
-    public synchronized void sendMessage(String message) {
-        messageQueue.add(message);
+    public synchronized void send(T obj) {
+        messageQueue.add(obj);
         notifyAll();
     }
 }

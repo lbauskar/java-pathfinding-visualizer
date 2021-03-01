@@ -9,9 +9,9 @@ import org.junit.Test;
  */
 public class ConsumerTest {
     /**
-     * Tests that a Consumer can retrieve messages from its producer, and that the
-     * messages have the same value as what was put into the producer. Also tests
-     * that the consumer will wait for new messages to appear if the message queue
+     * Tests that a Consumer can retrieve messages from {@code sq}, and that the
+     * messages have the same value as what was put into {@code sq}. Also tests
+     * that the consumer will wait for new messages to appear if {@code sq}
      * is empty.
      * 
      * @throws InterruptedException this function waited too long for the consumer
@@ -20,10 +20,10 @@ public class ConsumerTest {
     @Test
     public void getMessages() throws InterruptedException {
         String message = Long.toString(System.currentTimeMillis());
-        SynchronizedQueue sq = new SynchronizedQueue();
-        sq.sendMessage(message);
+        SynchronizedQueue<String> sq = new SynchronizedQueue<>();
+        sq.send(message);
 
-        Consumer c = new Consumer(sq) {
+        Consumer<String> c = new Consumer<>(sq) {
             public void run() {
                 while (true) {
                     // Do nothing
@@ -33,7 +33,7 @@ public class ConsumerTest {
 
         assertEquals(message, c.getMessage());
 
-        c = new Consumer(sq) {
+        c = new Consumer<>(sq) {
             public void run() {
                 try {
                     this.getMessage();

@@ -81,9 +81,9 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * 
      * @param cols      number of tiles this grid should have along the x-axis
      * @param rows      number of tiles this grid should have along the y-axis
-     * @param syncQueue Producer you want this TileGrid to listen to
+     * @param syncQueue SynchronizedQueue you want this TileGrid to listen to
      */
-    public TileGrid(int rows, int cols, SynchronizedQueue syncQueue) {
+    public TileGrid(int rows, int cols, SynchronizedQueue<String> syncQueue) {
         this.addMouseMotionListener(this);
         this.setBackground(Pallete.WALL);
 
@@ -96,7 +96,7 @@ public class TileGrid extends JPanel implements MouseInputListener {
         changeSource(0, 0);
         changeDest(numRows - 1, numCols - 1);
 
-        new Consumer(syncQueue) {
+        new Consumer<String>(syncQueue) {
             @Override
             public void run() {
                 while (true) {
@@ -264,7 +264,6 @@ public class TileGrid extends JPanel implements MouseInputListener {
                 break;
 
             default:
-                // System.out.println("Unknown message " + message);
                 break;
         }
     }
@@ -536,11 +535,11 @@ public class TileGrid extends JPanel implements MouseInputListener {
      * that represents its background color. For example, a 5x5 TileGrid with a source tile at (0, 0),
      * a destination tile at (4, 4), and a wall down the middle would look like
      * <p>
-     * scwcc <br/>
-     * ccwcc <br/>
-     * ccwcc <br/>
-     * ccwcc <br/>
-     * ccwcd <br/>
+     * scwcc <br>
+     * ccwcc <br>
+     * ccwcc <br>
+     * ccwcc <br>
+     * ccwcd <br>
      * <p>
      * A space is appended to the end of each line to help Scanners differentiate between an AxB TileGrid
      * and a BxA TileGrid.

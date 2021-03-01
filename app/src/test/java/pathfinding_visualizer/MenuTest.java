@@ -11,7 +11,7 @@ import javax.swing.*;
  * Tests the {@link Menu} class.
  */
 public class MenuTest {
-    private SynchronizedQueue sq = new SynchronizedQueue();
+    private SynchronizedQueue<String> sq = new SynchronizedQueue<>();
     private Menu m = new Menu(sq);
 
     private JPanel resize, source, dest, diag, alg, clear, erase, maze;
@@ -65,11 +65,11 @@ public class MenuTest {
 
         checkbox.setSelected(true);
         listener.actionPerformed(event);
-        assertEquals("diagonal true", sq.getMessage());
+        assertEquals("diagonal true", sq.get());
         
         checkbox.setSelected(false);
         listener.actionPerformed(event);
-        assertEquals("diagonal false", sq.getMessage());
+        assertEquals("diagonal false", sq.get());
     }
 
     @Test
@@ -87,7 +87,7 @@ public class MenuTest {
         ActionEvent event = new ActionEvent(button, ActionEvent.ACTION_PERFORMED, null);
         listener.actionPerformed(event);
 
-        assertEquals(expected, sq.getMessage());
+        assertEquals(expected, sq.get());
     }
 
     @Test
@@ -107,7 +107,7 @@ public class MenuTest {
         ActionEvent event = new ActionEvent(button, ActionEvent.ACTION_PERFORMED, null);
         listener.actionPerformed(event);
         long time = System.currentTimeMillis();
-        String[] args = sq.getMessage().split(" ");
+        String[] args = sq.get().split(" ");
         assertEquals("maze", args[0]);
         assertTrue(Math.abs(time - Long.parseLong(args[1])) < 5);
     }
@@ -118,7 +118,7 @@ public class MenuTest {
         ActionEvent event = new ActionEvent(button, ActionEvent.ACTION_PERFORMED, null);
         listener.actionPerformed(event);
 
-        assertEquals(expected, sq.getMessage());
+        assertEquals(expected, sq.get());
     }
 
     private void testTextPanel(JPanel panel) throws InterruptedException {
@@ -144,7 +144,7 @@ public class MenuTest {
         ActionEvent event = new ActionEvent(tf, ActionEvent.ACTION_PERFORMED, null);
         listener.actionPerformed(event);
         if (shouldWork) {
-            assertEquals(expected, sq.getMessage());
+            assertEquals(expected, sq.get());
         } else {
             assertEquals(0, sq.size());
         }

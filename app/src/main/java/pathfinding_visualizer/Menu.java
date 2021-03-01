@@ -9,18 +9,18 @@ import java.awt.*;
 @SuppressWarnings("serial")
 public class Menu extends JPanel {
     /**
-     * Producer this Menu sends messages to
+     * SynchronizedQueue this Menu sends messages to
      */
-    private transient SynchronizedQueue syncQueue;
+    private transient SynchronizedQueue<String> syncQueue;
 
     /**
-     * Creates a Menu that sends messages using the {@code producer}. The
-     * {@link TileGrid} you want to modify use the same {@code producer} in its
+     * Creates a Menu that sends messages using {@code syncQueue}. The
+     * {@link TileGrid} you want to modify should also use {@code syncQueue} in its
      * constructor.
      * 
-     * @param syncQueue Producer you want this Menu to send messages with
+     * @param syncQueue SynchronizedQueue you want this Menu to send messages to
      */
-    public Menu(SynchronizedQueue syncQueue) {
+    public Menu(SynchronizedQueue<String> syncQueue) {
         
         //Use system theme for the menu
         try {
@@ -133,7 +133,7 @@ public class Menu extends JPanel {
         checkBox.addActionListener(
             event -> {
                 String message = String.format("diagonal %b", checkBox.isSelected());
-                syncQueue.sendMessage(message);
+                syncQueue.send(message);
             }
         );
 
@@ -156,7 +156,7 @@ public class Menu extends JPanel {
         button.addActionListener(
             event -> {
                 String message = String.format("search %s 5", box.getSelectedItem());
-                syncQueue.sendMessage(message);
+                syncQueue.send(message);
             }
         );
 
@@ -177,7 +177,7 @@ public class Menu extends JPanel {
         button.addActionListener(
             event -> {
                 String message = "clear";
-                syncQueue.sendMessage(message);
+                syncQueue.send(message);
             }
         );
 
@@ -197,7 +197,7 @@ public class Menu extends JPanel {
         button.addActionListener(
             event -> {
                 String message = "erase";
-                syncQueue.sendMessage(message);
+                syncQueue.send(message);
             }
         );
 
@@ -217,7 +217,7 @@ public class Menu extends JPanel {
         button.addActionListener(
             event -> {
                 String message = "maze " + System.currentTimeMillis();
-                syncQueue.sendMessage(message);
+                syncQueue.send(message);
             }
         );
 
@@ -227,7 +227,7 @@ public class Menu extends JPanel {
     }
 
     /**
-     * Creates a JTextField that attempts to send a message via {@code producer} when enter is pressed.
+     * Creates a JTextField that attempts to send a message via {@code syncQueue} when enter is pressed.
      * The message is only sent if this text field's text evaluates to an integer between {@code min} and {@code max}.
      * 
      * @param min smallest allowable integer value
@@ -245,7 +245,7 @@ public class Menu extends JPanel {
                 if (s.matches("-?\\d+")) { // s is an integer
                     int x = Integer.parseInt(s);
                     if (x > min && x <= max) {
-                            syncQueue.sendMessage(String.format("%s %d", command, x));
+                            syncQueue.send(String.format("%s %d", command, x));
                     }
                 }
             }

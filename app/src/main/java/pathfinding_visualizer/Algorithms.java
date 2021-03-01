@@ -252,6 +252,7 @@ public class Algorithms {
      * @param sourceCoord Pair of Integers equal to location of source tile
      * @param destCoord Pair of Integers equal to location of destination tile
      * @param graph TileGraph this algorithm will run on
+     * @param random Random type object which determines the maze that will be created
      * @return Set of Integer Pairs that correspond to the tiles that should be walls
      */
     public static Set<Pair<Integer, Integer>> makeMaze(Pair<Integer, Integer> sourceCoord, Pair<Integer, Integer> destCoord, TileGraph graph, Random random) {

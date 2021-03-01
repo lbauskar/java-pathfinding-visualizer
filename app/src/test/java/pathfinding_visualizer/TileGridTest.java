@@ -12,10 +12,10 @@ public class TileGridTest {
 
     private final String outDir = "src/test/java/pathfinding_visualizer/";
     private final String resDir = outDir + "TileGridTestResults/";
+    private SynchronizedQueue<String> sq = new SynchronizedQueue<>();
 
     @Test
     public void makeTileGrid() throws IOException {
-        SynchronizedQueue sq = new SynchronizedQueue();
         TileGrid fourByFour = new TileGrid(4, 4, sq);
         writeToOut(fourByFour.toString());
         outTxtEquals("4x4.txt");
@@ -35,97 +35,77 @@ public class TileGridTest {
 
     @Test
     public void testResizing() throws IOException, InterruptedException {
-
-        SynchronizedQueue sq = new SynchronizedQueue();
         TileGrid tg = new TileGrid(7, 5, sq);
         
         writeToOut(tg.toString());
         outTxtEquals("7x5.txt");
 
-        sq.sendMessage("resize row 3");
-        Thread.sleep(50);
-        writeToOut(tg.toString());
-        outTxtEquals("7x5.txt");
+        testMessage(tg, "resize row 3", 50, "7x5.txt");
+        testMessage(tg, "resize row 1000", 50, "7x5.txt");
+        testMessage(tg, "resize col 3", 50, "7x5.txt");
+        testMessage(tg, "resize col 1000", 50, "7x5.txt");
 
-        sq.sendMessage("resize row 1000");
-        Thread.sleep(50);
-        writeToOut(tg.toString());
-        outTxtEquals("7x5.txt");
-
-        sq.sendMessage("resize col 3");
-        Thread.sleep(50);
-        writeToOut(tg.toString());
-        outTxtEquals("7x5.txt");
-
-        sq.sendMessage("resize col 1000");
-        Thread.sleep(50);
-        writeToOut(tg.toString());
-        outTxtEquals("7x5.txt");
-
-        sq.sendMessage("resize row 4");
-        Thread.sleep(50);
-        writeToOut(tg.toString());
-        outTxtEquals("4x5.txt");
-
-        sq.sendMessage("resize col 4");
-        Thread.sleep(50);
-        writeToOut(tg.toString());
-        outTxtEquals("4x4.txt");
+        testMessage(tg, "resize row 4", 50, "4x5.txt");
+        testMessage(tg, "resize col 4", 50, "4x4.txt");
     }
 
     @Test
     public void testAlgorithmsDiagAndClear() throws IOException, InterruptedException {
-        SynchronizedQueue sq = new SynchronizedQueue();
         TileGrid tg = new TileGrid(10, 10, sq);
 
         writeToOut(tg.toString());
         outTxtEquals("10x10.txt");
 
-        sq.sendMessage("search Djikstra 0");
-        Thread.sleep(100);
-        writeToOut(tg.toString());
-        outTxtEquals("djikstra.txt");
+        testMessage(tg, "search Djikstra 0", 100, "djikstra.txt");
 
-        sq.sendMessage("diagonal true");
-        Thread.sleep(50);
-        sq.sendMessage("search BFS 0");
-        Thread.sleep(100);
-        writeToOut(tg.toString());
+        sq.send("diagonal true");
+        testMessage(tg, "search BFS 0", 100, "bfs.txt");
 
-        sq.sendMessage("diagonal false");
-        sq.sendMessage("search A* 0");
-        Thread.sleep(100);
-        writeToOut(tg.toString());
-        outTxtEquals("astar.txt");
+        sq.send("diagonal false");
+        testMessage(tg, "search A* 0", 100, "astar.txt");
 
-        sq.sendMessage("clear");
-        Thread.sleep(50);
-        writeToOut(tg.toString());
-        outTxtEquals("10x10.txt");
+        testMessage(tg, "clear", 50, "10x10.txt");
     }
 
     @Test
     public void testMazeAndErase() throws IOException, InterruptedException {
-        SynchronizedQueue sq = new SynchronizedQueue();
         TileGrid tg = new TileGrid(20, 20, sq);
 
         writeToOut(tg.toString());
         outTxtEquals("20x20.txt");
 
-        sq.sendMessage("maze 2021");
-        Thread.sleep(100);
-        writeToOut(tg.toString());
-        outTxtEquals("maze.txt");
-
-        sq.sendMessage("erase");
-        Thread.sleep(50);
-        writeToOut(tg.toString());
-        outTxtEquals("20x20.txt");
+        testMessage(tg, "maze 2021", 100, "maze.txt");
+        testMessage(tg, "erase", 50, "20x20.txt");
     }
 
     @Test
     public void testChangingSourceAndDest() throws IOException, InterruptedException {
+        TileGrid tg = new TileGrid(5, 5, sq);
 
+        testMessage(tg, "destination row 0", 10, "moved_dest.txt");
+        testMessage(tg, "destination col 0", 10, "swapped_dest.txt");
+        testMessage(tg, "source col 3", 10, "moved_source.txt");
+        testMessage(tg, "source row 4", 10, "moved_source2.txt");
+
+        sq.send("source col 0");
+        testMessage(tg, "source row 0", 10, "swapped_source.txt");
+
+        testMessage(tg, "source col 100", 10, "swapped_source.txt");
+        testMessage(tg, "source row 100", 10, "swapped_source.txt");
+        testMessage(tg, "destination col 100", 10, "swapped_source.txt");
+        testMessage(tg, "destination row 100", 10, "swapped_source.txt");
+
+        testMessage(tg, "source col -1", 10, "swapped_source.txt");
+        testMessage(tg, "source row -1", 10, "swapped_source.txt");
+        testMessage(tg, "destination col -1", 10, "swapped_source.txt");
+        testMessage(tg, "destination row -1", 10, "swapped_source.txt");
+    }
+
+    private void testMessage(TileGrid tg, String message, long wait, String file) throws IOException, InterruptedException {
+        sq.send(message);
+        Thread.sleep(wait);
+        writeToOut(tg.toString());
+        outTxtEquals(file);
     }
 
     private void writeToOut(String s) throws IOException {

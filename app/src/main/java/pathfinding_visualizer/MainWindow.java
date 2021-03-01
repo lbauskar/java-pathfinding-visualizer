@@ -26,7 +26,7 @@ public class MainWindow extends JFrame {
         pane.setPreferredSize(new Dimension(width, height)); // set window size in pixels
 
         // create subpanels
-        SynchronizedQueue syncQueue = new SynchronizedQueue();
+        SynchronizedQueue<String> syncQueue = new SynchronizedQueue<>();
         JPanel menu = new Menu(syncQueue);
         TileGrid grid = new TileGrid(20, 20, syncQueue);
 
