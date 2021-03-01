@@ -1,13 +1,11 @@
 package pathfinding_visualizer;
 
-import java.io.Serializable;
 import java.util.*;
 
 /**
  * Mathematical graph that should correspond to the tiles in the parent {@link TileGrid}.
  */
-public class TileGraph implements Serializable {
-    private static final long serialVersionUID = -4976456041837817365L;
+public class TileGraph {
     /**
      * Number of columns in the {@link #graph} field
      */

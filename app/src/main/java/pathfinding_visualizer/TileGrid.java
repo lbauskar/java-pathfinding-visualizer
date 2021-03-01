@@ -6,16 +6,14 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.InputEvent;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+
 
 /**
  * Rectangular, gridded tilemap used for pathfinding visualization.
  */
+@SuppressWarnings("serial")
 public class TileGrid extends JPanel implements MouseInputListener {
 
     /**
@@ -35,21 +33,21 @@ public class TileGrid extends JPanel implements MouseInputListener {
     /**
      * The undlerlying logical graph used for pathfinding.
      */
-    private TileGraph graph;
+    private transient TileGraph graph;
     /**
      * The location of the source tile.
      */
-    private Pair<Integer, Integer> sourceCoord = new Pair<>(0, 0);
+    private transient Pair<Integer, Integer> sourceCoord = new Pair<>(0, 0);
     /**
      * The location of the destination tile.
      */
-    private Pair<Integer, Integer> destCoord = new Pair<>(19, 19);
+    private transient Pair<Integer, Integer> destCoord = new Pair<>(19, 19);
     /**
      * Whether {@link #graph} should connect nodes that are touching diagonally.
      */
     private boolean connectDiagonals = false;
 
-    private Thread algorithmDrawingThread = null;
+    private transient Thread algorithmDrawingThread = null;
 
     /**
      * A collection of colors labelled by what the tile is supposed to represent.
@@ -584,4 +582,5 @@ public class TileGrid extends JPanel implements MouseInputListener {
             }
         }
     }
+
 }

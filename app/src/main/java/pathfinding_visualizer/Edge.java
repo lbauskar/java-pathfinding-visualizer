@@ -1,12 +1,8 @@
 package pathfinding_visualizer;
-
-import java.io.Serializable;
-
 /**
  * Representation of a graph's edge.
  */
-public class Edge implements Comparable<Edge>, Serializable {
-    private static final long serialVersionUID = 4320064514277253414L;
+public class Edge implements Comparable<Edge> {
     /**
      * Node this Edge is leaving (source node)
      */

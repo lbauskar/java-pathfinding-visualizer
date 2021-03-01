@@ -6,13 +6,12 @@ import java.awt.*;
 /**
  * JPanel with UI elements that modifies a {@link TileGrid}.
  */
+@SuppressWarnings("serial")
 public class Menu extends JPanel {
-    private static final long serialVersionUID = -2183382640701870707L;
-
     /**
      * Producer this Menu sends messages to
      */
-    private SynchronizedQueue syncQueue;
+    private transient SynchronizedQueue syncQueue;
 
     /**
      * Creates a Menu that sends messages using the {@code producer}. The

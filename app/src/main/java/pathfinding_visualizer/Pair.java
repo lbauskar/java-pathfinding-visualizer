@@ -1,26 +1,18 @@
 package pathfinding_visualizer;
 
-import java.io.Serializable;
-
 /**
- * Simple structure that contains two serializable objects. Both objects are publicly accessible.
+ * Simple structure that contains two objects. Both objects are publicly accessible.
  */
-public class Pair<T extends Serializable, U extends Serializable> implements Serializable {
-    private static final long serialVersionUID = -8529217112653744086L;
-    /**
-     * A serializable object.
-     */
+public class Pair<T, U> {
+    
     public T first;
-    /**
-     * A serializable object.
-     */
     public U second;
 
     /**
      * Creates a {@link Pair} containing {@code first} and {@code second}.
      * 
-     * @param first serializable object
-     * @param second serializable object
+     * @param first object of type T
+     * @param second object of type U
      */
     public Pair(T first, U second) {
         this.first = first;

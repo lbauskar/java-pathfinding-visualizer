@@ -1,12 +1,9 @@
 package pathfinding_visualizer;
 
-import java.io.Serializable;
-
 /**
  * Representation of a graph's node or vertex.
  */
-public class Node implements Comparable<Node>, Serializable {
-    private static final long serialVersionUID = -6429126713188723800L;
+public class Node implements Comparable<Node> {
     /**
      * Row of 2D array this is in
      */

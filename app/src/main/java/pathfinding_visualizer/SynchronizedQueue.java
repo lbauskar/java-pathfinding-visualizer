@@ -1,14 +1,12 @@
 package pathfinding_visualizer;
 
-import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.Queue;
 
 /**
  * Sends String messages to a {@link Consumer}.
  */
-public class SynchronizedQueue implements Serializable {
-    private static final long serialVersionUID = -5768889538764837228L;
+public class SynchronizedQueue {
     /**
      * Queue of Strings to be sent to a Consumer. 
      */
