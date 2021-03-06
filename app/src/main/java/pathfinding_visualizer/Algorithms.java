@@ -291,7 +291,7 @@ public class Algorithms {
             walls.remove(wallCoord);
 
             visited.add(next);
-            stack.add(next);
+            stack.push(next);
         }
 
         return walls;
