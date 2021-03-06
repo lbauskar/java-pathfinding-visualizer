@@ -85,8 +85,8 @@ public class Menu extends JPanel {
         JLabel l1 = new JLabel("Source: (");
         JLabel l2 = new JLabel(",");
         JLabel l3 = new JLabel(")");
-        JTextField xField = makeIntegerField(0, 99, 19, 2, "source col");
-        JTextField yField = makeIntegerField(0, 99, 19, 2, "source row");
+        JTextField xField = makeIntegerField(0, 99, 0, 2, "source col");
+        JTextField yField = makeIntegerField(0, 99, 0, 2, "source row");
 
         JPanel panel = new JPanel();
         panel.add(l1);
